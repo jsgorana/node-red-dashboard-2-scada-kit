@@ -1,0 +1,111 @@
+node-red-dashboard-2-scada-kit
+Copyright 2026 jsgorana
+
+This product includes software developed by jsgorana
+(https://github.com/jsgorana).
+
+================================================================================
+ACKNOWLEDGEMENTS
+================================================================================
+
+This project builds on top of, is inspired by, or is designed to work with the
+following open-source projects and standards. We are grateful to their authors
+and maintainers.
+
+--------------------------------------------------------------------------------
+Node-RED — https://nodered.org
+Copyright OpenJS Foundation and Node-RED contributors
+Licensed under the Apache License, Version 2.0
+
+This kit is a set of installable nodes for the Node-RED flow-based programming
+platform. Node-RED is a project of the OpenJS Foundation.
+
+--------------------------------------------------------------------------------
+Node-RED Dashboard 2.0 (@flowfuse/node-red-dashboard)
+Copyright FlowFuse Inc. and contributors
+Licensed under the Apache License, Version 2.0
+https://github.com/FlowFuse/node-red-dashboard
+
+This kit's widget nodes are built against the Dashboard 2.0 third-party widget
+API. The architecture, Vue 3 component model, Socket.IO event names, and
+datastore pattern used here follow FlowFuse's documented extension model.
+
+--------------------------------------------------------------------------------
+node-red-contrib-ui-svg — https://github.com/bartbutenaers/node-red-contrib-ui-svg
+Copyright Bart Butenaers and contributors
+Licensed under the Apache License, Version 2.0
+
+The tag-binding DSL design in this kit (selector, source, target, transform) is
+directly inspired by the binding model pioneered in node-red-contrib-ui-svg.
+That module is now archived; this kit aims to continue and extend that work for
+the Dashboard 2.0 / Vue 3 era.
+
+--------------------------------------------------------------------------------
+DOMPurify — https://github.com/cure53/DOMPurify
+Copyright Mario Heiderich and Cure53
+Licensed under Apache License 2.0 / Mozilla Public License 2.0
+
+Used for server-side and client-side sanitization of untrusted SVG content to
+prevent XSS vulnerabilities.
+
+--------------------------------------------------------------------------------
+Vue.js — https://vuejs.org
+Copyright Evan You and Vue.js contributors
+Licensed under the MIT License
+
+The widget UI components in this kit are built as Vue 3 single-file components,
+using the Options API as documented by FlowFuse for Dashboard 2.0 widgets.
+
+--------------------------------------------------------------------------------
+Vite — https://vitejs.dev
+Copyright Evan You and Vite contributors
+Licensed under the MIT License
+
+Used as the build tool to bundle Vue 3 components into UMD format for
+Node-RED Dashboard 2.0.
+
+--------------------------------------------------------------------------------
+Vuetify — https://vuetifyjs.com
+Copyright John Leider and Vuetify contributors
+Licensed under the MIT License
+
+Available as a component library via Node-RED Dashboard 2.0; used in faceplate
+templates for accessible form controls.
+
+--------------------------------------------------------------------------------
+ajv (Another JSON Schema Validator) — https://ajv.js.org
+Copyright Evgeny Poberezkin
+Licensed under the MIT License
+
+Used for validation of the tag-binding DSL JSON schema.
+
+--------------------------------------------------------------------------------
+STANDARDS AND GUIDELINES (informational — no code copied)
+
+The design, visual style, alarm state model, and security requirements of this
+kit draw on the following standards and guidelines. No text from these standards
+is reproduced in this software. References are for attribution and traceability:
+
+  - ANSI/ISA-101.01-2015 — Human-Machine Interfaces for Process Automation
+    Systems. International Society of Automation (ISA).
+
+  - ANSI/ISA-18.2-2016 / IEC 62682 — Management of Alarm Systems for the
+    Process Industries. ISA / IEC.
+
+  - IEC 62443-4-1:2018 and IEC 62443-4-2:2019 — Security for Industrial
+    Automation and Control Systems. IEC.
+
+  - "The High Performance HMI Handbook" — Bill Hollifield, Eddie Habibi,
+    Ian Nimmo, and Marc Son. PAS Global LLC / ASM Consortium.
+
+  - ANSI/ISA-5.1 and ISA-5.5 — Instrumentation Symbols and Identification /
+    Graphic Symbols for Process Displays. ISA.
+
+  - OWASP Top 10:2021, XSS Prevention Cheat Sheet, and Content Security
+    Policy Cheat Sheet. Open Web Application Security Project (OWASP).
+
+  - WCAG 2.2 — Web Content Accessibility Guidelines 2.2.
+    W3C Recommendation, 5 October 2023 (updated 12 December 2024).
+    Also published as ISO/IEC 40500:2025.
+
+================================================================================

@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      dev-tooling:
+        patterns: ["eslint*", "prettier*", "vite*", "vitest*", "@vue/test-utils*"]
+      security-deps:
+        patterns: ["dompurify*", "jsdom*", "sanitize-html*", "ajv*"]
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

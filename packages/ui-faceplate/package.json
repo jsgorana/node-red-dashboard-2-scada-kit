@@ -1,0 +1,41 @@
+{
+  "name": "@jsgorana/node-red-dashboard-2-scada-faceplate",
+  "version": "0.1.0",
+  "description": "Equipment faceplate popup node for Node-RED Dashboard 2.0 — motor, valve, PID templates with RBAC, write-confirmation, and ISA-18.2 alarm states",
+  "keywords": ["node-red", "node-red-dashboard", "node-red-dashboard-2", "scada", "hmi", "faceplate", "industrial", "iiot", "isa-18.2", "isa-101"],
+  "license": "Apache-2.0",
+  "author": "jsgorana <jsgorana@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsgorana/node-red-dashboard-2-scada-kit.git",
+    "directory": "packages/ui-faceplate"
+  },
+  "bugs": { "url": "https://github.com/jsgorana/node-red-dashboard-2-scada-kit/issues" },
+  "homepage": "https://github.com/jsgorana/node-red-dashboard-2-scada-kit#readme",
+  "engines": { "node": ">=20.0.0" },
+  "main": "nodes/ui-scada-faceplate.js",
+  "node-red": {
+    "version": ">=4.0.0",
+    "nodes": {
+      "ui-scada-faceplate": "nodes/ui-scada-faceplate.js"
+    }
+  },
+  "node-red-dashboard-2": {
+    "version": ">=1.0.0",
+    "widgets": {
+      "ui-scada-faceplate": {
+        "output": "resources/ui-scada-faceplate.umd.js",
+        "component": "UIScadaFaceplate"
+      }
+    }
+  },
+  "files": ["nodes", "resources", "examples", "docs/assets", "README.md", "CHANGELOG.md", "LICENSE", "NOTICE"],
+  "scripts": {
+    "build": "vite build",
+    "test":  "mocha 'test/**/*_spec.js' --timeout 20000 && vitest run",
+    "dev":   "vite build --watch"
+  },
+  "dependencies": {
+    "@jsgorana/node-red-dashboard-2-scada-core": "^0.1.0"
+  }
+}

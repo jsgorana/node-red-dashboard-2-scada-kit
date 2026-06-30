@@ -1,0 +1,32 @@
+{
+  "name": "node-red-dashboard-2-scada-kit",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test":  "npm run test  --workspaces --if-present",
+    "lint":  "eslint 'packages/*/src/**/*.{js,vue}' 'packages/*/nodes/**/*.js'",
+    "clean": "rimraf packages/*/dist packages/*/resources"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.44.0",
+    "@vue/test-utils": "^2.4.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "mocha": "^10.4.0",
+    "node-red": "^5.0.0",
+    "node-red-node-test-helper": "^0.3.4",
+    "prettier": "^3.2.0",
+    "rimraf": "^5.0.0",
+    "should": "^13.2.3",
+    "vite": "^5.2.0",
+    "vitest": "^1.6.0",
+    "@cyclonedx/cyclonedx-npm": "^1.19.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

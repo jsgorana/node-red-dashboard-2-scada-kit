@@ -1,0 +1,12 @@
+node_modules/
+packages/*/dist/
+packages/*/resources/
+packages/*/node_modules/
+packages/*/coverage/
+*.log
+*.tgz
+.env
+.DS_Store
+coverage/
+dist/
+sbom.json
