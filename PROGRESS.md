@@ -24,7 +24,7 @@
 | Phase | Status | Notes |
 |-------|--------|-------|
 | 0 — Repo & scaffold | ✅ Complete | GitHub repo live, all package stubs committed |
-| 1 — Core library | ⬜ Not started | DSL parser, SVG sanitizer, alarm FSM, theme tokens |
+| 1 — Core library | ✅ Complete | 69/69 tests passing — XSS corpus, DSL pipeline, alarm FSM |
 | 2 — ui-mimic | ⬜ Not started | |
 | 3 — symbols | ⬜ Not started | |
 | 4 — ui-faceplate | ⬜ Not started | |
@@ -57,11 +57,12 @@
 
 **Next session should start with:**
 1. `cd '/Users/boss/Documents/Github Projects/scada-kit-nrd2'`
-2. Read `PROGRESS.md` — then begin **Phase 1: Core library**
-3. `packages/core/src/dsl/parser.js` — ajv schema + validation
-4. `packages/core/src/sanitizer/server.js` — DOMPurify-over-jsdom
-5. `packages/core/src/alarm/fsm.js` — ISA-18.2 state machine
-6. Write XSS corpus tests first (`packages/core/test/sanitizer.spec.js`)
+2. Read `PROGRESS.md` — then begin **Phase 2: ui-mimic**
+3. `packages/ui-mimic/nodes/ui-scada-mimic.js` — Node-RED server node
+4. `packages/ui-mimic/nodes/ui-scada-mimic.html` — editor properties panel + DSL JSON editor
+5. `packages/ui-mimic/ui/components/UIScadaMimic.vue` — Vue 3 component
+6. Server test: `packages/ui-mimic/test/server_spec.js` (node-red-node-test-helper)
+7. Docker install test: `./scripts/dev-install.sh ui-mimic` → verify in browser at http://localhost:1880
 
 ---
 
