@@ -23,14 +23,14 @@
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 0 — Repo & scaffold | ⬜ Not started | |
+| 0 — Repo & scaffold | ✅ Complete | GitHub repo live, all package stubs committed |
 | 1 — Core library | ⬜ Not started | DSL parser, SVG sanitizer, alarm FSM, theme tokens |
 | 2 — ui-mimic | ⬜ Not started | |
 | 3 — symbols | ⬜ Not started | |
 | 4 — ui-faceplate | ⬜ Not started | |
-| 5 — CI/CD | ⬜ Not started | |
-| 6 — Docker local testing | ⬜ Not started | |
-| 7 — Docs & README | ⬜ Not started | |
+| 5 — CI/CD | ✅ Complete | ci.yml + release.yml committed with Phase 0 |
+| 6 — Docker local testing | ⬜ Not started | scripts/dev-install.sh ready |
+| 7 — Docs & README | 🔄 In progress | README scaffold done; screenshots/examples pending |
 | 8 — flows.nodered.org | ⬜ Not started | Only after stable + documented |
 
 ---
@@ -45,14 +45,23 @@
 - Reviewed `@jsgorana/node-red-opcua` structure as quality reference
 - Confirmed Docker `node-red` container (port 1880, Node.js v24, data volume `/data`)
 - Established correct scoped package names: `@jsgorana/node-red-dashboard-2-scada-*`
-- Created project subfolder: `scada-kit-nrd2/`
-- Wrote detailed `IMPLEMENTATION_PLAN.md` (8 phases, naming convention, Docker workflow, flows.nodered.org checklist)
-- Created this `PROGRESS.md`
+- **Phase 0 complete:** GitHub repo created and pushed — https://github.com/jsgorana/node-red-dashboard-2-scada-kit
+  - All 4 package stubs with correct `package.json` (node-red + node-red-dashboard-2 sections)
+  - Vite UMD build configs for ui-mimic and ui-faceplate
+  - CI + release workflows, Dependabot
+  - Apache-2.0 LICENSE + NOTICE (full acknowledgements: FlowFuse, node-red-contrib-ui-svg, DOMPurify, Vue, Vite, standards)
+  - CONTRIBUTING.md (DCO), SECURITY.md, CHANGELOG.md
+  - `scripts/dev-install.sh` Docker test script
+  - README.md scaffold with standards compliance table and acknowledgements
+- Memory + PROGRESS.md updated
 
 **Next session should start with:**
 1. `cd '/Users/boss/Documents/Github Projects/scada-kit-nrd2'`
-2. Read `PROGRESS.md` and `IMPLEMENTATION_PLAN.md`
-3. Begin Phase 0: `gh repo create jsgorana/node-red-dashboard-2-scada-kit ...`
+2. Read `PROGRESS.md` — then begin **Phase 1: Core library**
+3. `packages/core/src/dsl/parser.js` — ajv schema + validation
+4. `packages/core/src/sanitizer/server.js` — DOMPurify-over-jsdom
+5. `packages/core/src/alarm/fsm.js` — ISA-18.2 state machine
+6. Write XSS corpus tests first (`packages/core/test/sanitizer.spec.js`)
 
 ---
 
