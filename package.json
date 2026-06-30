@@ -16,7 +16,7 @@
     "@vue/test-utils": "^2.4.0",
     "eslint": "^9.0.0",
     "eslint-plugin-vue": "^9.0.0",
-    "mocha": "^10.4.0",
+    "mocha": "^11.7.6",
     "node-red": "^5.0.0",
     "node-red-node-test-helper": "^0.3.4",
     "prettier": "^3.2.0",
