@@ -7,15 +7,13 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-01
+
 ### Added
-- Initial monorepo scaffold (npm workspaces)
-- `packages/core` — stub for DSL parser, SVG sanitizer, alarm FSM, theme tokens
-- `packages/ui-mimic` — stub for SVG synoptic display node
-- `packages/ui-faceplate` — stub for equipment faceplate popup node
-- `packages/symbols` — stub for HP-HMI SVG symbol library
-- GitHub Actions CI workflow (lint + test + build)
-- GitHub Actions release workflow (OIDC provenance + CycloneDX SBOM)
-- Dependabot configuration
-- Apache-2.0 license and NOTICE file with full acknowledgements
-- CONTRIBUTING.md, SECURITY.md
-- Docker local test script (`scripts/dev-install.sh`)
+- Production Node-RED Dashboard 2.0 SCADA package with `ui-scada-mimic` and `ui-scada-faceplate`.
+- Sanitized SVG mimic rendering with declarative tag bindings, comm-loss fallback, and keyboard-accessible SVG events.
+- Faceplate templates for motor, valve, and PID equipment.
+- Client write confirmation plus server-side RBAC, min/max validation, rate-of-change validation, interlock blocking, and structured audit records.
+- ISA-18.2 alarm helpers and faceplate alarm controls for acknowledge, shelve/unshelve, and out-of-service intents.
+- HP-HMI / ISA-101 SVG symbol catalog and importable `symbols` API.
+- Example flows, documentation, CI, SBOM, and npm provenance release workflow.

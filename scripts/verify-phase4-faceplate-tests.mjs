@@ -1,7 +1,7 @@
 import { chromium } from 'playwright'
 import fs from 'node:fs'
 
-const url = process.env.PHASE4_FACEPLATE_URL || 'http://localhost:1880/scada/faceplate'
+const url = process.env.PHASE4_FACEPLATE_URL || 'http://localhost:1880/scada-phase4/faceplate'
 const adminBase = process.env.NODE_RED_ADMIN_URL || 'http://localhost:1880'
 const chromeExecutable = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const auditUrl = `${adminBase}/scada-phase4-faceplate/audit`
@@ -106,6 +106,8 @@ try {
   assert(checks, audit?.result === 'DENIED', 'unauthenticated live write is denied', audit?.result)
   assert(checks, audit?.reason === 'role-not-authorized', 'denial reason is role-not-authorized', audit?.reason)
   assert(checks, audit?.action === 'pid.setpoint', 'audit records PID setpoint action', audit?.action)
+  assert(checks, audit?.oldValue === 50, 'audit records old setpoint value', audit?.oldValue)
+  assert(checks, audit?.newValue === 62.5, 'audit records new setpoint value', audit?.newValue)
   assert(checks, audit?.payload?.setpoint === 62.5, 'audit records confirmed setpoint payload', audit?.payload)
   assert(checks, metrics.dialogVisible === false, 'confirmation dialog closes after confirm', metrics.dialogVisible)
 

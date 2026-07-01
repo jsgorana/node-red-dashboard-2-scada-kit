@@ -6,11 +6,7 @@
 [![Node-RED](https://img.shields.io/badge/node--red-%3E%3D4.0.0-red)](https://nodered.org)
 [![Dashboard 2.0](https://img.shields.io/badge/dashboard--2.0-%3E%3D1.0.0-orange)](https://github.com/FlowFuse/node-red-dashboard)
 
----
-
-> **Status: 🚧 Pre-release — core, mimic, symbols, and faceplate all functional and verified live in Node-RED Dashboard 2.0.** Packages are not yet published to npm; install from source.
-
----
+Public package: [`@jsgorana/node-red-dashboard-2-scada`](https://www.npmjs.com/package/@jsgorana/node-red-dashboard-2-scada).
 
 ## What You Get
 
@@ -19,9 +15,9 @@ A single package — [`@jsgorana/node-red-dashboard-2-scada`](https://www.npmjs.
 | Node | Description |
 |------|-------------|
 | `ui-scada-mimic` | Render a process SVG with declarative tag bindings — no per-screen JavaScript |
-| `ui-scada-faceplate` | Equipment faceplates (motor, valve, PID) with write-confirmation and RBAC |
+| `ui-scada-faceplate` | Equipment faceplates (motor, valve, PID) with alarm state display, write-confirmation, RBAC, interlock checks, and audit |
 
-The binding DSL + SVG sanitizer + ISA-18.2 alarm FSM (the former `core` library) and the HP-HMI **SVG symbol library** (pumps, valves, tanks, breakers, gauges) are bundled in. The symbols are also importable directly: `require('@jsgorana/node-red-dashboard-2-scada/symbols')`.
+The binding DSL, SVG sanitizer, ISA-18.2 alarm helpers, HP-HMI theme tokens, and the SVG symbol library are bundled in. The symbols are also importable directly: `require('@jsgorana/node-red-dashboard-2-scada/symbols')`.
 
 The kit is **protocol-agnostic** — it consumes normalized tag values from any upstream Node-RED node (OPC UA, Modbus, MQTT, Sparkplug, etc.) and does not bundle drivers.
 
@@ -43,7 +39,7 @@ ISA-101 / HP-HMI symbols — color only signals the abnormal, with redundant sha
 
 ### Faceplate — `ui-scada-faceplate`
 
-Equipment faceplate (PID shown) with setpoint entry, mode buttons, a client-side write-confirmation step, and **server-side RBAC** — browser-asserted roles are never trusted; unauthorized writes are denied and audited.
+Equipment faceplate (PID shown) with setpoint entry, mode buttons, alarm actions, a client-side write-confirmation step, and **server-side RBAC**. Browser-asserted roles are never trusted; unauthorized, out-of-range, rate-limited, or interlocked writes are denied and audited.
 
 ![PID faceplate with setpoint entry and Write SP / Auto / Manual controls](docs/assets/faceplate.png)
 
@@ -51,15 +47,15 @@ Equipment faceplate (PID shown) with setpoint entry, mode buttons, a client-side
 
 | Standard | Coverage |
 |----------|----------|
-| ISA-101 / High-Performance HMI | Display hierarchy, gray palette, color-for-abnormal-only, shape+label redundancy |
-| ISA-18.2 / IEC 62682 | Full 7-state alarm lifecycle, priority distribution, ack/shelve |
-| IEC 62443-4-1 / 4-2 | Secure SDL, RBAC, audit logging, SVG sanitization, SBOM |
-| OWASP Top 10:2021 | XSS (A03) via DOMPurify + CSP; access control (A01) server-side deny-by-default |
-| WCAG 2.2 AA | Keyboard operability, target size, focus, contrast, not color-alone |
+| ISA-101 / High-Performance HMI | Gray-first visual language, color-for-abnormal-only, shape+label redundancy, reusable symbol hooks |
+| ISA-18.2 / IEC 62682 | Seven-state alarm model helpers plus faceplate display/actions for ack, shelve/unshelve, and out-of-service intents |
+| IEC 62443-4-1 / 4-2 | Server-side authorization, audit events, secure SVG handling, CI/SBOM/provenance release process; host identity, TLS, and network zoning remain deployer responsibilities |
+| OWASP Top 10:2021 | SVG XSS mitigation through server/client DOMPurify; access control enforced server-side and deny-by-default |
+| WCAG 2.2 AA intent | Keyboard-accessible mimic events, redundant non-color state cues, target sizing, focus styling, and ARIA status/dialog semantics |
 
 ## Requirements
 
-- Node.js `>=20.0.0`
+- Node.js `>=22.0.0`
 - Node-RED `>=4.0.0`
 - `@flowfuse/node-red-dashboard` `>=1.0.0` (Dashboard 2.0)
 
@@ -107,7 +103,7 @@ The package ships two importable, self-contained example flows. Once installed, 
 | Example | Shows |
 |---------|-------|
 | [`mimic-tank-pump.json`](packages/scada/examples/mimic-tank-pump.json) | A tank + pump mimic driven by declarative tag bindings (level fill, pump color/status/amps). |
-| [`faceplate-pid-rbac.json`](packages/scada/examples/faceplate-pid-rbac.json) | A PID faceplate with setpoint entry, write-confirmation, and server-side RBAC + audit (outputs 1 = allowed write, 2 = audit). |
+| [`faceplate-pid-rbac.json`](packages/scada/examples/faceplate-pid-rbac.json) | A PID faceplate with alarm display/actions, setpoint entry, write-confirmation, interlock/permissive fields, rate limits, and server-side RBAC + audit. |
 
 Both bundle their own Dashboard base/theme/page/group, so they render immediately on import. They are protocol-agnostic — swap the `inject` + `function` simulators for your real OPC UA / Modbus / MQTT source.
 

@@ -1,4 +1,5 @@
-const { authorizeWrite } = require('./rbac')
+const datastore = require('@flowfuse/node-red-dashboard/nodes/store/data.js')
+const { authorizeWrite, isControlIntent } = require('./rbac')
 
 module.exports = function (RED) {
     function UIScadaFaceplateNode(config) {
@@ -15,15 +16,15 @@ module.exports = function (RED) {
         const evts = {
             onAction: true,
             beforeSend: function (msg) {
-                if (!msg?._client && !msg?.socket && !msg?.user) {
+                if (!isControlIntent(msg)) {
                     return msg
                 }
-
                 const result = authorizeWrite(msg, config)
                 return [result.allowedMsg, result.auditMsg]
             },
-            onInput: function (msg) {
-                node.send([msg, null])
+            onInput: function (msg, send) {
+                datastore.save(group.getBase(), node, msg)
+                send([msg, null])
             },
         }
 

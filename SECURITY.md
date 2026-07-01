@@ -33,4 +33,4 @@ We follow coordinated disclosure. We will:
 
 ## Known attack surface
 
-The dominant risk in this kit is **XSS via untrusted SVG** (user- or PLC-supplied SVG content rendered inline in the browser). The mitigations are documented in the SRS and implemented in `packages/core/src/sanitizer/`. If you find a bypass, it is high priority — please report it.
+The dominant risk in this kit is **XSS via untrusted SVG** (user- or PLC-supplied SVG content rendered inline in the browser). The mitigations are documented in the SRS and implemented in `packages/scada/lib/sanitizer/`. If you find a bypass, it is high priority — please report it.

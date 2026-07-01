@@ -16,12 +16,16 @@
       <p>{{ action.label }}</p>
       <dl>
         <div>
+          <dt>Equipment</dt>
+          <dd>{{ action.equipmentId || '--' }}</dd>
+        </div>
+        <div>
           <dt>Topic</dt>
           <dd>{{ action.topic }}</dd>
         </div>
         <div>
-          <dt>Value</dt>
-          <dd>{{ valueText }}</dd>
+          <dt>Change</dt>
+          <dd>{{ changeText }}</dd>
         </div>
       </dl>
       <footer>
@@ -55,10 +59,11 @@ export default {
     emits: ['cancel', 'confirm'],
 
     computed: {
-        valueText () {
+        changeText () {
             if (!this.action) return '--'
-            const value = this.action.payload?.value ?? this.action.payload?.setpoint ?? this.action.payload?.command
-            return value === undefined ? '--' : String(value)
+            const oldValue = this.action.oldValue ?? '--'
+            const newValue = this.action.newValue ?? this.action.payload?.value ?? this.action.payload?.setpoint ?? this.action.payload?.command
+            return newValue === undefined ? `${oldValue} -> --` : `${oldValue} -> ${newValue}`
         },
     },
 }

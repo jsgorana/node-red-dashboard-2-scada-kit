@@ -16,7 +16,12 @@
                 template:   { value: 'motor' },
                 min:        { value: '' },
                 max:        { value: '' },
+                rateLimit:  { value: '' },
                 allowRoles: { value: '' },
+                ackRoles:   { value: '' },
+                shelveRoles:{ value: '' },
+                oosRoles:   { value: '' },
+                shelveDurationMs: { value: 1800000 },
             },
             inputs: 1,
             outputs: 2,
@@ -88,9 +93,30 @@
         <span style="margin-left:6px;color:#888;font-size:0.82em">Enforced server-side; out-of-range writes are denied &amp; audited</span>
     </div>
     <div class="form-row">
+        <label for="node-input-rateLimit"><i class="fa fa-tachometer"></i> SP rate limit</label>
+        <input type="number" id="node-input-rateLimit" style="width:100px" placeholder="10">
+        <span style="margin-left:6px;color:#888;font-size:0.82em">Max allowed old→new setpoint delta; blank disables</span>
+    </div>
+    <div class="form-row">
         <label for="node-input-allowRoles"><i class="fa fa-shield"></i> Allow roles</label>
         <input type="text" id="node-input-allowRoles" style="width:240px" placeholder="operator, supervisor, engineer">
         <span style="margin-left:6px;color:#888;font-size:0.82em">Comma-separated. Default: operator, supervisor, engineer</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-ackRoles"><i class="fa fa-check-square-o"></i> Ack roles</label>
+        <input type="text" id="node-input-ackRoles" style="width:240px" placeholder="operator, supervisor, engineer">
+    </div>
+    <div class="form-row">
+        <label for="node-input-shelveRoles"><i class="fa fa-pause"></i> Shelve roles</label>
+        <input type="text" id="node-input-shelveRoles" style="width:240px" placeholder="supervisor, engineer">
+    </div>
+    <div class="form-row">
+        <label for="node-input-oosRoles"><i class="fa fa-wrench"></i> OOS roles</label>
+        <input type="text" id="node-input-oosRoles" style="width:240px" placeholder="engineer">
+    </div>
+    <div class="form-row">
+        <label for="node-input-shelveDurationMs"><i class="fa fa-clock-o"></i> Shelve ms</label>
+        <input type="number" id="node-input-shelveDurationMs" style="width:120px" min="1000" max="86400000" placeholder="1800000">
     </div>
 </script>
 
@@ -111,12 +137,18 @@
                 <li><code>mode</code> — control mode: <code>"AUTO"</code>, <code>"MAN"</code>, <code>"CAS"</code></li>
                 <li><code>status</code> — equipment status: <code>"RUNNING"</code>, <code>"STOPPED"</code>, <code>"TRIPPED"</code></li>
                 <li><code>interlock</code> — boolean; when <code>true</code>, command buttons are disabled and labeled INTERLOCKED</li>
+                <li><code>interlocks</code> — array of active blocking conditions: <code>{ id, label, active, blocks }</code></li>
+                <li><code>permissives</code> — array of permissive checks: <code>{ id, label, ok }</code></li>
+                <li><code>alarm</code> — ISA-18.2 state object: <code>{ state, priority, message, active }</code></li>
             </ul>
             Example:
             <pre>{
   "pv": 62.4,  "sp": 65.0,
   "mode": "AUTO",  "status": "RUNNING",
-  "interlock": false
+  "interlock": false,
+  "interlocks": [],
+  "permissives": [],
+  "alarm": { "state": "NORMAL", "priority": "LOW", "message": "" }
 }</pre>
         </dd>
     </dl>
@@ -146,7 +178,8 @@
 }</pre>
             <code>result</code> is <code>"ALLOWED"</code> or <code>"DENIED"</code>.
             <code>reason</code> is one of: <code>authorized</code>, <code>role-not-authorized</code>,
-            <code>below-minimum</code>, <code>above-maximum</code>.
+            <code>below-minimum</code>, <code>above-maximum</code>, <code>rate-limit-exceeded</code>,
+            <code>interlock-active</code>, <code>not-confirmed</code>, or <code>invalid-shelve-duration</code>.
         </li>
     </ol>
 
@@ -167,12 +200,19 @@
             <em>server-side</em> and emitted as <code>DENIED / below-minimum</code> or
             <code>DENIED / above-maximum</code> on the audit output. Client-side limit display
             is additional defense-in-depth.</dd>
+        <dt>SP rate limit</dt>
+        <dd>Optional maximum old→new setpoint delta. Larger confirmed changes are rejected
+            server-side with <code>DENIED / rate-limit-exceeded</code>.</dd>
         <dt>Allow roles</dt>
         <dd>Comma-separated list of roles permitted to write.
             Default: <code>operator, supervisor, engineer</code>.<br>
             Roles come from <code>msg._client.user.role</code> (FlowFuse authentication or
             Node-RED <code>adminAuth</code> with role claims). Without authentication, all
             writes are denied — useful to verify the RBAC gate before adding auth.</dd>
+        <dt>Ack / Shelve / OOS roles</dt>
+        <dd>Separate role gates for alarm acknowledgement, shelving, and out-of-service actions.
+            Defaults are operator+supervisor+engineer for ack, supervisor+engineer for shelve,
+            and engineer for out-of-service.</dd>
     </dl>
 
     <h3>RBAC and Security Model</h3>
@@ -181,8 +221,12 @@
         <li><b>Server-side enforcement:</b> RBAC runs in the node <code>.js</code> file.
             An attacker sending a raw <code>widget-action</code> Socket.IO message as an
             unauthenticated user will be denied and audited — the browser cannot bypass this gate.</li>
-        <li><b>Write confirmation:</b> the client-side dialog shows the topic and value
+        <li><b>Write confirmation:</b> the client-side dialog shows equipment, topic, and old→new value
             and requires explicit Confirm before emitting to the server — guards against accidental presses.</li>
+        <li><b>Interlock blocking:</b> active interlocks/permissive failures disable client controls and are
+            enforced again server-side before any command is emitted.</li>
+        <li><b>Alarm actions:</b> acknowledge, shelve/unshelve, and out-of-service intents are role-gated
+            and audited through the same server path as setpoint and command writes.</li>
         <li><b>No secrets in flow JSON:</b> use Node-RED <code>credentials</code> for any sensitive config.</li>
         <li>Satisfies IEC 62443-4-2 CR 2.1 (Authorization enforcement), CR 2.8/2.9 (Audit).</li>
     </ul>

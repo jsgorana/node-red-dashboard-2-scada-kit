@@ -4,6 +4,8 @@ const flowId = 'scada-phase4-faceplate-tests'
 const flowLabel = 'SCADA Kit — Phase 4 Faceplate'
 const pageId = 'scada-phase4-faceplate-page'
 const groupId = 'scada-phase4-faceplate-group'
+const baseId = 'scada-phase4-ui-base'
+const themeId = 'scada-phase4-ui-theme'
 const faceplateId = 'scada-phase4-faceplate-pid'
 const injectId = 'scada-phase4-faceplate-inject'
 const stateId = 'scada-phase4-faceplate-state'
@@ -24,7 +26,18 @@ msg.payload = {
     pv: 47.2,
     sp: 50,
     mode: 'MAN',
-    status: 'READY'
+    status: 'READY',
+    interlocks: [],
+    permissives: [
+        { id: 'loop-healthy', label: 'Loop healthy', ok: true }
+    ],
+    alarm: {
+        state: 'UNACK',
+        priority: 'HIGH',
+        message: 'Phase 4 verification alarm',
+        active: true,
+        source: 'PID-101.PV'
+    }
 };
 return msg;
 `.trim()
@@ -108,6 +121,11 @@ const flow = {
       template: 'pid',
       min: '0',
       max: '100',
+      rateLimit: '20',
+      ackRoles: 'operator, supervisor, engineer',
+      shelveRoles: 'supervisor, engineer',
+      oosRoles: 'engineer',
+      shelveDurationMs: '1800000',
       includeClientData: true,
       x: 600,
       y: 100,
@@ -246,15 +264,46 @@ const flow = {
   ],
   configs: [
     {
+      id: baseId,
+      type: 'ui-base',
+      z: flowId,
+      name: 'SCADA Phase 4 UI',
+      path: '/scada-phase4',
+      includeClientData: true,
+      acceptsClientConfig: ['ui-notification', 'ui-control'],
+      showPathInSidebar: false,
+      navigationStyle: 'default',
+      titleBarStyle: 'default',
+    },
+    {
+      id: themeId,
+      type: 'ui-theme',
+      z: flowId,
+      name: 'SCADA Phase 4 HP-HMI Theme',
+      colors: {
+        surface: '#f5f5f5',
+        primary: '#546e7a',
+        bgPage: '#eeeeee',
+        groupBg: '#e0e0e0',
+        groupOutline: '#bdbdbd',
+      },
+      sizes: {
+        pagePadding: '12px',
+        groupGap: '12px',
+        groupBorderRadius: '4px',
+        widgetGap: '6px',
+      },
+    },
+    {
       id: pageId,
       type: 'ui-page',
       z: flowId,
       name: 'Phase 4 Faceplate',
-      ui: 'scada-ui-base',
+      ui: baseId,
       path: '/faceplate',
       icon: 'mdi-tune-vertical',
       layout: 'grid',
-      theme: 'scada-ui-theme',
+      theme: themeId,
       breakpoints: [{ name: 'Default', px: '0', cols: '12' }],
       order: 3,
       className: '',
@@ -308,4 +357,4 @@ if (existingFlow) {
   console.log(`Created Phase 4 faceplate test flow: ${flowId}`)
 }
 
-console.log(`Dashboard URL: ${adminBase.replace(/\/$/, '')}/scada/faceplate`)
+console.log(`Dashboard URL: ${adminBase.replace(/\/$/, '')}/scada-phase4/faceplate`)

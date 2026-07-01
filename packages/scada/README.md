@@ -11,7 +11,7 @@ One package, two Dashboard 2.0 nodes:
 | Node | What it does |
 |------|--------------|
 | **`ui-scada-mimic`** | Render a process SVG and animate it from tag values — fill levels, colors, text, visibility, rotation — with **no per-screen JavaScript**. |
-| **`ui-scada-faceplate`** | Equipment faceplate (motor / valve / PID) with setpoint entry, write-confirmation, and **server-side RBAC + audit**. |
+| **`ui-scada-faceplate`** | Equipment faceplate (motor / valve / PID) with alarm state display, setpoint entry, write-confirmation, interlock checks, and **server-side RBAC + audit**. |
 
 A library of ISA-101 / HP-HMI SVG symbols (pump, motor, valves, tank, conveyor, breaker, bargraph, multistate indicator, mini-trend, pipe) is bundled in.
 
@@ -25,7 +25,7 @@ The kit is **protocol-agnostic** — it consumes a normalized tag map from any u
 npm install @jsgorana/node-red-dashboard-2-scada
 ```
 
-Or via **Menu → Manage palette → Install** and search for the package name. Requires Node-RED `>=4.0`, Node.js `>=20`, and `@flowfuse/node-red-dashboard` `>=1.0` (Dashboard 2.0). Both nodes appear in the palette under the **dashboard 2** group alongside the stock widgets.
+Or via **Menu → Manage palette → Install** and search for the package name. Requires Node-RED `>=4.0`, Node.js `>=22`, and `@flowfuse/node-red-dashboard` `>=1.0` (Dashboard 2.0). Both nodes appear in the palette under the **dashboard 2** group alongside the stock widgets.
 
 ## Quick start
 
@@ -55,7 +55,7 @@ return msg;
 
 ## Faceplate writes & RBAC
 
-The faceplate gates operator writes: a client-side confirmation, then **server-side authorization** (browser-asserted roles are never trusted). Output 1 is the allowed write/state; output 2 is the audit stream (emitted for both allowed and denied writes). Map Dashboard authentication and the node's allowed roles (`operator` / `supervisor` / `engineer`) to permit real writes.
+The faceplate gates operator writes: a client-side confirmation, then **server-side authorization** (browser-asserted roles are never trusted). Output 1 is the allowed write/state; output 2 is the audit stream (emitted for both allowed and denied writes). The server gate enforces roles, engineering limits, optional setpoint rate limits, interlock blocking, and separate alarm action roles for acknowledge, shelve, and out-of-service.
 
 ![PID faceplate with setpoint entry and Write SP / Auto / Manual controls](docs/assets/faceplate.png)
 
@@ -74,6 +74,7 @@ Each symbol has documented, bindable element ids (status text, value text, level
 - [Getting started](https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/getting-started.md)
 - [Binding DSL reference](https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/binding-dsl.md)
 - [Symbol catalog](https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/symbol-catalog.md)
+- [Release and publishing notes](https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/publishing.md)
 
 ## License
 

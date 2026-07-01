@@ -38,7 +38,7 @@ describe('UIScadaFaceplate write confirmation', () => {
   it('does not emit a control write before confirmation', async () => {
     const { wrapper, socket } = mountFaceplate()
 
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.command-row button').trigger('click')
 
     expect(socket.emit).not.toHaveBeenCalled()
     expect(wrapper.text()).toContain('Confirm write')
@@ -47,14 +47,22 @@ describe('UIScadaFaceplate write confirmation', () => {
   it('emits widget-action only after confirmation', async () => {
     const { wrapper, socket } = mountFaceplate()
 
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.command-row button').trigger('click')
     await wrapper.get('.confirm-dialog .primary').trigger('click')
 
     expect(socket.emit).toHaveBeenCalledTimes(1)
     expect(socket.emit).toHaveBeenCalledWith('widget-action', 'faceplate-1', {
       action: 'motor.command',
       topic: 'motor.command',
-      payload: { command: 'start' },
+      payload: {
+        equipmentId: 'P-101',
+        oldValue: 'RUNNING',
+        value: 'start',
+        confirmed: true,
+        interlocks: [],
+        permissives: [],
+        command: 'start',
+      },
     })
     expect(wrapper.text()).not.toContain('Confirm write')
   })
@@ -62,7 +70,7 @@ describe('UIScadaFaceplate write confirmation', () => {
   it('cancels pending writes without emitting', async () => {
     const { wrapper, socket } = mountFaceplate()
 
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.command-row button').trigger('click')
     await wrapper.get('.confirm-dialog .secondary').trigger('click')
 
     expect(socket.emit).not.toHaveBeenCalled()
@@ -76,13 +84,62 @@ describe('UIScadaFaceplate write confirmation', () => {
     })
 
     await wrapper.get('input').setValue('62.5')
-    await wrapper.get('button').trigger('click')
+    await wrapper.get('.command-row button').trigger('click')
     await wrapper.get('.confirm-dialog .primary').trigger('click')
 
     expect(socket.emit).toHaveBeenCalledWith('widget-action', 'faceplate-1', {
       action: 'pid.setpoint',
       topic: 'pid.setpoint',
-      payload: { setpoint: 62.5, value: 62.5 },
+      payload: {
+        equipmentId: 'P-101',
+        oldValue: 55,
+        value: 62.5,
+        confirmed: true,
+        interlocks: [],
+        permissives: [],
+        setpoint: 62.5,
+      },
     })
+  })
+
+  it('renders ISA-18.2 alarm actions and emits ack requests after confirmation', async () => {
+    const { wrapper, socket } = mountFaceplate({
+      state: {
+        alarm: {
+          state: 'UNACK',
+          priority: 'HIGH',
+          message: 'High temperature',
+          active: true,
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Unacknowledged')
+    expect(wrapper.text()).toContain('High - High temperature')
+
+    await wrapper.get('.alarm-actions button').trigger('click')
+    await wrapper.get('.confirm-dialog .primary').trigger('click')
+
+    expect(socket.emit).toHaveBeenCalledWith('widget-action', 'faceplate-1', {
+      action: 'alarm.ack',
+      topic: 'alarm.ack',
+      payload: expect.objectContaining({
+        equipmentId: 'P-101',
+        action: 'alarm.ack',
+        confirmed: true,
+        alarm: expect.objectContaining({ state: 'UNACK' }),
+      }),
+    })
+  })
+
+  it('disables command buttons when interlocks are active', () => {
+    const { wrapper } = mountFaceplate({
+      state: {
+        interlocks: [{ id: 'low-flow', label: 'Low flow permissive', active: true, blocks: ['*'] }],
+      },
+    })
+
+    expect(wrapper.text()).toContain('Low flow permissive')
+    expect(wrapper.get('.command-row button').attributes('disabled')).toBeDefined()
   })
 })

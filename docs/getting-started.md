@@ -4,15 +4,15 @@ This tutorial gets a live SCADA mimic on screen in a few minutes, then shows how
 
 ## Prerequisites
 
-- Node.js `>=20`
+- Node.js `>=22`
 - Node-RED `>=4.0`
 - `@flowfuse/node-red-dashboard` `>=1.0` (Dashboard 2.0) installed and a Dashboard page configured
 
 ## 1. Install
 
-**Palette Manager** *(once published)* — **Menu → Manage palette → Install**, search `@jsgorana/node-red-dashboard-2-scada`, click **Install**. Both nodes (`ui-scada-mimic`, `ui-scada-faceplate`) are added.
+**Palette Manager** — **Menu → Manage palette → Install**, search `@jsgorana/node-red-dashboard-2-scada`, click **Install**. Both nodes (`ui-scada-mimic`, `ui-scada-faceplate`) are added.
 
-**npm** *(once published)*
+**npm**
 
 ```bash
 npm install @jsgorana/node-red-dashboard-2-scada
@@ -102,14 +102,40 @@ In production, replace this with your OPC UA / Modbus / MQTT / Sparkplug nodes, 
 
 ## 4. Add a faceplate (operator writes)
 
-For setpoint changes, mode switches, and other **writes**, use `ui-scada-faceplate` rather than mimic events — it adds a client-side confirmation step and **server-side RBAC + audit**.
+For setpoint changes, mode switches, alarm acknowledgement/shelving, and other **writes**, use `ui-scada-faceplate` rather than raw mimic events. It adds a client-side confirmation step and **server-side RBAC + audit**.
 
 Import [`packages/scada/examples/faceplate-pid-rbac.json`](../packages/scada/examples/faceplate-pid-rbac.json) to see a PID faceplate wired end-to-end:
 
-- **Output 1** — the allowed write / state passthrough.
-- **Output 2** — the audit stream (emitted for both allowed *and* denied writes).
+- **Output 1** — allowed writes and state passthrough.
+- **Output 2** — the audit stream, emitted for both allowed *and* denied writes.
 
-Writes are **denied by default**: a browser-asserted role is never trusted. Map Dashboard authentication and the node's allowed roles (`operator` / `supervisor` / `engineer`) to permit real writes. Until then, unauthenticated writes are correctly denied and audited — useful for verifying the gate.
+Writes are **denied by default**: a browser-asserted role is never trusted. Map Dashboard authentication and the node's allowed roles (`operator` / `supervisor` / `engineer`) to permit real writes. The server gate also checks engineering min/max, optional rate-of-change limits, active interlocks/permissive failures, and separate roles for alarm acknowledgement, shelving, and out-of-service actions.
+
+The faceplate accepts this normalized state shape:
+
+```json
+{
+  "pv": 62.4,
+  "sp": 65.0,
+  "mode": "AUTO",
+  "status": "RUNNING",
+  "interlocks": [
+    { "id": "guard", "label": "Guard closed", "active": false, "blocks": ["*"] }
+  ],
+  "permissives": [
+    { "id": "loop-healthy", "label": "Loop healthy", "ok": true }
+  ],
+  "alarm": {
+    "state": "NORMAL",
+    "priority": "LOW",
+    "message": "",
+    "active": false,
+    "source": "TIC-101.PV"
+  }
+}
+```
+
+Alarm states are `NORMAL`, `UNACK`, `ACK`, `RTN_UNACK`, `SHELVED`, `SUPPRESSED_BY_DESIGN`, and `OUT_OF_SERVICE`. Priorities are `HIGH`, `MEDIUM`, `LOW`, and `ADVISORY`.
 
 ## 5. Use the symbol library
 

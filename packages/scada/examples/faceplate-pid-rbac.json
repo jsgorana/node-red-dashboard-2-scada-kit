@@ -6,7 +6,10 @@
         "name": "SCADA Demo UI",
         "path": "/scada",
         "includeClientData": true,
-        "acceptsClientConfig": ["ui-notification", "ui-control"],
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
         "showPathInSidebar": false,
         "navigationStyle": "default",
         "titleBarStyle": "default"
@@ -32,9 +35,9 @@
     },
     {
         "type": "tab",
-        "label": "SCADA Faceplate — PID + RBAC",
+        "label": "SCADA Faceplate \u2014 PID + RBAC",
         "id": "scada-faceplate-tab",
-        "info": "## PID Faceplate with RBAC Example\n\nDemonstrates the `ui-scada-faceplate` node with server-side RBAC and audit logging.\n\n### What it shows\n- **PID faceplate** (TIC-101): process variable, setpoint, control mode, status\n- **Setpoint entry** with engineering limits (0–100) enforced server-side\n- **Auto / Manual** mode buttons with write-confirmation dialog\n- **Server-side RBAC**: all writes are deny-by-default; the browser cannot bypass the gate\n- **Audit output**: every write attempt (allowed or denied) emits a structured audit record\n\n### How the data flows\n```\nInject (2 s) → PID state simulator → ui-scada-faceplate\n                                          ├─ Output 1 (allowed write/state) → Debug\n                                          └─ Output 2 (audit record)         → Debug\n```\n\n### RBAC in this example\nWithout FlowFuse or adminAuth configured, `msg._client.user` is absent, so all operator button presses are denied and appear on the audit output with `result: DENIED, reason: role-not-authorized`.\n\nTo permit writes during development, add a function node before the faceplate that injects a mock user:\n```javascript\nmsg._client = { user: { role: 'operator', username: 'test' } };\nreturn msg;\n```\n\n### Compliance\n- IEC 62443-4-2 CR 2.1 (Authorization enforcement)\n- IEC 62443-4-2 CR 2.8 / 2.9 (Audit events / storage)\n- ISA-101 write-confirmation requirement",
+        "info": "## PID Faceplate with RBAC Example\n\nDemonstrates the `ui-scada-faceplate` node with server-side RBAC and audit logging.\n\n### What it shows\n- **PID faceplate** (TIC-101): process variable, setpoint, control mode, status\n- **Setpoint entry** with engineering limits (0\u2013100) enforced server-side\n- **Auto / Manual** mode buttons with write-confirmation dialog\n- **Server-side RBAC**: all writes are deny-by-default; the browser cannot bypass the gate\n- **Audit output**: every write attempt (allowed or denied) emits a structured audit record\n\n### How the data flows\n```\nInject (2 s) \u2192 PID state simulator \u2192 ui-scada-faceplate\n                                          \u251c\u2500 Output 1 (allowed write/state) \u2192 Debug\n                                          \u2514\u2500 Output 2 (audit record)         \u2192 Debug\n```\n\n### RBAC in this example\nWithout FlowFuse or adminAuth configured, `msg._client.user` is absent, so all operator button presses are denied and appear on the audit output with `result: DENIED, reason: role-not-authorized`.\n\nTo permit writes during development, add a function node before the faceplate that injects a mock user:\n```javascript\nmsg._client = { user: { role: 'operator', username: 'test' } };\nreturn msg;\n```\n\n### Compliance\n- IEC 62443-4-2 CR 2.1 (Authorization enforcement)\n- IEC 62443-4-2 CR 2.8 / 2.9 (Audit events / storage)\n- ISA-101 write-confirmation requirement",
         "disabled": false
     },
     {
@@ -43,7 +46,11 @@
         "z": "scada-faceplate-tab",
         "name": "Seed PID state (every 2 s)",
         "info": "Triggers the state simulator every 2 seconds.\nIn production, replace this + the function node with your protocol source (OPC UA, Modbus, etc.).",
-        "props": [{ "p": "payload" }],
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
         "repeat": "2",
         "crontab": "",
         "once": true,
@@ -53,15 +60,19 @@
         "payloadType": "date",
         "x": 150,
         "y": 100,
-        "wires": [["scada-faceplate-state"]]
+        "wires": [
+            [
+                "scada-faceplate-state"
+            ]
+        ]
     },
     {
         "id": "scada-faceplate-state",
         "type": "function",
         "z": "scada-faceplate-tab",
         "name": "PID state simulator",
-        "info": "Produces a normalized state payload for the faceplate.\n\nIn production, replace this with your protocol source node and map its output to:\n```json\n{\n  \"pv\":       <number>,   // process variable\n  \"sp\":       <number>,   // current setpoint\n  \"mode\":     \"AUTO\",    // AUTO | MAN | CAS\n  \"status\":   \"RUNNING\", // RUNNING | STOPPED | TRIPPED\n  \"interlock\": false      // true disables command buttons\n}\n```",
-        "func": "// Simulate a slowly oscillating PV around the setpoint\nvar t = Date.now() / 12000;\nvar pv = 47.2 + 3 * Math.sin(t);\nmsg.payload = {\n    pv:        Math.round(pv * 10) / 10,\n    sp:        50.0,\n    mode:      'AUTO',\n    status:    'RUNNING',\n    interlock: false\n};\nreturn msg;",
+        "info": "Produces a normalized state payload for the faceplate, including alarm/interlock fields used by the v1 safety path.",
+        "func": "// Simulate a slowly oscillating PV around the setpoint\nvar t = Date.now() / 12000;\nvar pv = 47.2 + 3 * Math.sin(t);\nvar alarmState = pv > 49.8 ? 'UNACK' : 'NORMAL';\nmsg.payload = {\n    pv:        Math.round(pv * 10) / 10,\n    sp:        50.0,\n    mode:      'AUTO',\n    status:    alarmState === 'NORMAL' ? 'RUNNING' : 'TRIPPED',\n    interlock: false,\n    interlocks: [],\n    permissives: [\n        { id: 'loop-healthy', label: 'Loop healthy', ok: true }\n    ],\n    alarm: {\n        state: alarmState,\n        priority: alarmState === 'NORMAL' ? 'LOW' : 'HIGH',\n        message: alarmState === 'NORMAL' ? '' : 'PV high',\n        active: alarmState !== 'NORMAL',\n        source: 'TIC-101.PV'\n    }\n};\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -70,7 +81,11 @@
         "libs": [],
         "x": 370,
         "y": 100,
-        "wires": [["scada-faceplate-node"]]
+        "wires": [
+            [
+                "scada-faceplate-node"
+            ]
+        ]
     },
     {
         "id": "scada-faceplate-node",
@@ -89,15 +104,24 @@
         "x": 610,
         "y": 100,
         "wires": [
-            ["scada-faceplate-allowed-debug"],
-            ["scada-faceplate-audit-debug"]
-        ]
+            [
+                "scada-faceplate-allowed-debug"
+            ],
+            [
+                "scada-faceplate-audit-debug"
+            ]
+        ],
+        "rateLimit": "10",
+        "ackRoles": "operator, supervisor, engineer",
+        "shelveRoles": "supervisor, engineer",
+        "oosRoles": "engineer",
+        "shelveDurationMs": "1800000"
     },
     {
         "id": "scada-faceplate-allowed-debug",
         "type": "debug",
         "z": "scada-faceplate-tab",
-        "name": "Output 1 — allowed write / state",
+        "name": "Output 1 \u2014 allowed write / state",
         "info": "Shows messages that passed RBAC.\nIn production, wire this to your protocol write node (OPC UA write, Modbus FC06, MQTT publish, etc.).",
         "active": true,
         "tosidebar": true,
@@ -115,8 +139,8 @@
         "id": "scada-faceplate-audit-debug",
         "type": "debug",
         "z": "scada-faceplate-tab",
-        "name": "Output 2 — audit record (all attempts)",
-        "info": "Shows every write attempt — allowed AND denied.\n\nAudit record format:\n{\n  ts:      <unix ms timestamp>,\n  user:    \"jsmith\",\n  role:    \"operator\",\n  action:  \"faceplate.write.sp\",\n  payload: { setpoint: 75.0 },\n  result:  \"ALLOWED\" | \"DENIED\",\n  reason:  \"authorized\" | \"role-not-authorized\" | \"below-minimum\" | \"above-maximum\"\n}\n\nIn production, wire this to a file-write, InfluxDB, or historian node for compliance logging (IEC 62443-4-2 CR 2.8/2.9).",
+        "name": "Output 2 \u2014 audit record (all attempts)",
+        "info": "Shows every write attempt \u2014 allowed AND denied. Audit records include timestamp, correlationId, user, role, equipmentId, action, oldValue, newValue, payload, confirmationResult, result, and reason.",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -140,7 +164,11 @@
         "layout": "grid",
         "theme": "scada-ui-theme",
         "breakpoints": [
-            { "name": "Default", "px": "0", "cols": "12" }
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "12"
+            }
         ],
         "order": 2,
         "className": "",

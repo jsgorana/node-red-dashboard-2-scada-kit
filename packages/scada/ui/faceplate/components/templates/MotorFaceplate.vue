@@ -7,18 +7,21 @@
     <div class="command-row">
       <button
         type="button"
+        :disabled="blocked"
         @click="command('start', 'Start motor')"
       >
         Start
       </button>
       <button
         type="button"
+        :disabled="blocked"
         @click="command('stop', 'Stop motor')"
       >
         Stop
       </button>
       <button
         type="button"
+        :disabled="blocked"
         @click="command('reset', 'Reset motor fault')"
       >
         Reset
@@ -33,6 +36,7 @@ export default {
 
     props: {
         state: { type: Object, default: () => ({}) },
+        blocked: { type: Boolean, default: false },
     },
 
     emits: ['write-request'],
@@ -46,6 +50,7 @@ export default {
             this.$emit('write-request', {
                 label,
                 topic: 'motor.command',
+                oldValue: this.state.status ?? null,
                 payload: { command },
             })
         },

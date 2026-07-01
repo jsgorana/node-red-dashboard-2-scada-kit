@@ -34,12 +34,84 @@
       </div>
     </dl>
 
+    <section
+      class="alarm-panel"
+      :class="alarm.className"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <div class="alarm-summary">
+        <span
+          class="alarm-shape"
+          aria-hidden="true"
+        >{{ alarmShape }}</span>
+        <div>
+          <strong>{{ alarm.label }}</strong>
+          <span>{{ alarm.priorityLabel }}{{ alarm.message ? ` - ${alarm.message}` : '' }}</span>
+        </div>
+      </div>
+      <div class="alarm-actions">
+        <button
+          type="button"
+          :disabled="!alarmActions.ack"
+          @click="requestAlarmAction('alarm.ack', 'Acknowledge alarm')"
+        >
+          Ack
+        </button>
+        <button
+          type="button"
+          :disabled="!alarmActions.shelve"
+          @click="requestAlarmAction('alarm.shelve', 'Shelve alarm', { durationMs: shelveDurationMs })"
+        >
+          Shelve
+        </button>
+        <button
+          type="button"
+          :disabled="!alarmActions.unshelve"
+          @click="requestAlarmAction('alarm.unshelve', 'Unshelve alarm')"
+        >
+          Unshelve
+        </button>
+        <button
+          type="button"
+          :disabled="!alarmActions.oosEnter && !alarmActions.oosExit"
+          @click="requestAlarmAction(alarmActions.oosExit ? 'alarm.oos.exit' : 'alarm.oos.enter', alarmActions.oosExit ? 'Return alarm to service' : 'Place alarm out of service')"
+        >
+          OOS
+        </button>
+      </div>
+    </section>
+
+    <section
+      v-if="interlocks.length || permissives.length"
+      class="blocking-panel"
+    >
+      <div
+        v-for="item in interlocks"
+        :key="`i-${item.id}`"
+        class="blocking-row active"
+      >
+        <span>Interlock</span>
+        <strong>{{ item.label }}</strong>
+      </div>
+      <div
+        v-for="item in permissives"
+        :key="`p-${item.id}`"
+        class="blocking-row"
+        :class="{ active: !item.ok }"
+      >
+        <span>Permissive</span>
+        <strong>{{ item.label }}</strong>
+      </div>
+    </section>
+
     <component
       :is="templateComponent"
       class="template-host"
       :state="mergedState"
       :min="minSetpoint"
       :max="maxSetpoint"
+      :blocked="commandsBlocked"
       @write-request="requestWrite"
     />
 
@@ -56,6 +128,7 @@ import WriteConfirmDialog from './WriteConfirmDialog.vue'
 import MotorFaceplate from './templates/MotorFaceplate.vue'
 import ValveFaceplate from './templates/ValveFaceplate.vue'
 import PIDFaceplate from './templates/PIDFaceplate.vue'
+import { alarmView, availableAlarmActions } from '../../../lib/alarm/view.js'
 
 const TEMPLATES = {
     motor: MotorFaceplate,
@@ -124,6 +197,53 @@ export default {
             return this.mergedState.mode || this.props.mode || 'MAN'
         },
 
+        equipmentId () {
+            return this.props.equipmentId || this.props.label || this.props.name || this.id
+        },
+
+        alarm () {
+            return alarmView(this.mergedState.alarm)
+        },
+
+        alarmActions () {
+            return availableAlarmActions(this.mergedState.alarm)
+        },
+
+        alarmShape () {
+            if (this.alarm.shape === 'none') return 'OK'
+            if (this.alarm.shape === 'pause') return 'II'
+            if (this.alarm.shape === 'slash') return '/'
+            if (this.alarm.shape === 'wrench') return 'OOS'
+            return '!'
+        },
+
+        shelveDurationMs () {
+            const value = Number(this.props.shelveDurationMs)
+            return Number.isFinite(value) && value > 0 ? value : 30 * 60 * 1000
+        },
+
+        interlocks () {
+            if (Array.isArray(this.mergedState.interlocks)) {
+                return this.mergedState.interlocks
+                    .filter(item => item && item.active)
+                    .map(item => ({ id: item.id || item.label, label: item.label || item.id || 'Interlock active' }))
+            }
+            return this.mergedState.interlock ? [{ id: 'interlock', label: 'Interlock active' }] : []
+        },
+
+        permissives () {
+            if (!Array.isArray(this.mergedState.permissives)) return []
+            return this.mergedState.permissives.map(item => ({
+                id:    item.id || item.label,
+                label: item.label || item.id || 'Permissive',
+                ok:    item.ok !== false,
+            }))
+        },
+
+        commandsBlocked () {
+            return this.interlocks.length > 0 || this.permissives.some(item => !item.ok)
+        },
+
         templateName () {
             return String(this.props.template || this.props.type || 'motor').toLowerCase()
         },
@@ -163,11 +283,43 @@ export default {
         },
 
         requestWrite (action) {
+            const value = action.payload?.value ?? action.payload?.setpoint ?? action.payload?.command ?? action.payload?.mode
+            const old = action.oldValue ?? this.currentValueFor(action.topic)
             this.pendingAction = {
-                label:   action.label || 'Write value',
-                topic:   action.topic || 'faceplate.write',
-                payload: action.payload || {},
+                label:       action.label || 'Write value',
+                topic:       action.topic || 'faceplate.write',
+                oldValue:    old,
+                newValue:    value,
+                equipmentId: this.equipmentId,
+                payload:     {
+                    equipmentId:        this.equipmentId,
+                    oldValue:           old,
+                    value,
+                    confirmed:          true,
+                    interlocks:         this.mergedState.interlocks || [],
+                    permissives:        this.mergedState.permissives || [],
+                    ...(action.payload || {}),
+                },
             }
+        },
+
+        requestAlarmAction (topic, label, extra = {}) {
+            this.requestWrite({
+                label,
+                topic,
+                payload: {
+                    action: topic,
+                    alarm:  this.mergedState.alarm || {},
+                    ...extra,
+                },
+            })
+        },
+
+        currentValueFor (topic) {
+            if (topic === 'pid.setpoint') return this.mergedState.sp ?? null
+            if (topic === 'pid.mode') return this.mergedState.mode ?? null
+            if (topic?.includes('command')) return this.mergedState.status ?? null
+            return null
         },
 
         cancelWrite () {
@@ -231,6 +383,95 @@ export default {
   margin: 0;
 }
 
+.alarm-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px;
+  border: 1px solid var(--hmi-line-normal, #757575);
+  background: var(--hmi-bg-display, #f5f5f5);
+}
+
+.alarm-summary {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.alarm-summary div {
+  display: grid;
+  min-width: 0;
+}
+
+.alarm-summary strong,
+.alarm-summary span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.alarm-shape {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 2px solid var(--hmi-line-normal, #757575);
+  color: var(--hmi-text-primary, #212121);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.alarm-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 44px);
+  gap: 4px;
+}
+
+.alarm-actions button {
+  min-width: 44px;
+  min-height: 32px;
+  font-size: 10px;
+}
+
+.alarm-unack .alarm-shape,
+.alarm-rtn-unack .alarm-shape {
+  border-color: var(--hmi-alarm-unack, #f44336);
+  color: var(--hmi-alarm-unack, #f44336);
+}
+
+.alarm-shelved .alarm-shape,
+.alarm-suppressed .alarm-shape {
+  border-color: var(--hmi-alarm-shelved, #9c27b0);
+  color: var(--hmi-alarm-shelved, #9c27b0);
+}
+
+.alarm-oos .alarm-shape {
+  border-color: var(--hmi-alarm-oos, #607d8b);
+  color: var(--hmi-alarm-oos, #607d8b);
+}
+
+.blocking-panel {
+  display: grid;
+  gap: 4px;
+}
+
+.blocking-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--hmi-line-normal, #757575);
+  background: var(--hmi-bg-display, #f5f5f5);
+  font-size: 11px;
+}
+
+.blocking-row.active {
+  border-color: var(--hmi-alarm-med, #ff9800);
+}
+
 .faceplate-values div { min-width: 0; }
 
 .faceplate-values dt {
@@ -286,6 +527,11 @@ export default {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+}
+
+:deep(button:disabled) {
+  cursor: not-allowed;
+  opacity: 0.52;
 }
 
 :deep(button:focus-visible) {
