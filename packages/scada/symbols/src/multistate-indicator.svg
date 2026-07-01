@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 70" role="img" aria-labelledby="multistate-title multistate-desc">
+  <title id="multistate-title">SCADA multistate indicator</title>
+  <desc id="multistate-desc">Indicator tile with bindable state shape, state text, value text, and alarm marker.</desc>
+  <g id="multistate-indicator" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <rect id="multistate-frame" x="5" y="8" width="110" height="54" rx="4" fill="var(--hmi-bg-panel)"/>
+    <circle id="multistate-state-shape" cx="27" cy="35" r="14" fill="var(--hmi-stopped)"/>
+    <path id="multistate-running-shape" d="M23 26l17 9-17 9z" fill="var(--hmi-running)" stroke="none"/>
+    <path id="multistate-alarm-shape" d="M94 15h17l-8.5 15z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)" stroke-width="2"/>
+    <text stroke="none" id="multistate-alarm-text" x="102.5" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="multistate-state-text" x="54" y="32" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+    <text stroke="none" id="multistate-value-text" x="54" y="48" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="var(--hmi-text-value)">AUTO</text>
+  </g>
+</svg>

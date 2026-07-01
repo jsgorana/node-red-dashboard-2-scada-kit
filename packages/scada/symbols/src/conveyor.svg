@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 80" role="img" aria-labelledby="conveyor-title conveyor-desc">
+  <title id="conveyor-title">SCADA conveyor symbol</title>
+  <desc id="conveyor-desc">Conveyor with bindable belt, rollers, motion arrows, status text, and alarm triangle.</desc>
+  <g id="conveyor" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <rect id="conveyor-belt" x="18" y="28" width="104" height="22" rx="11" fill="var(--hmi-stopped)"/>
+    <circle id="conveyor-roller-left" cx="29" cy="39" r="10" fill="var(--hmi-bg-panel)"/>
+    <circle id="conveyor-roller-right" cx="111" cy="39" r="10" fill="var(--hmi-bg-panel)"/>
+    <path id="conveyor-arrow-1" d="M53 32l14 7-14 7z" fill="var(--hmi-running)" stroke="none"/>
+    <path id="conveyor-arrow-2" d="M78 32l14 7-14 7z" fill="var(--hmi-running)" stroke="none"/>
+    <path id="conveyor-frame" d="M24 51L12 72M116 51l12 21M12 72h116" stroke="var(--hmi-line-active)" stroke-width="3"/>
+    <path id="conveyor-alarm-shape" d="M110 7h22l-11 19z" fill="var(--hmi-alarm-high)"/>
+    <text stroke="none" id="conveyor-alarm-text" x="121" y="22" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="conveyor-status-text" x="70" y="18" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

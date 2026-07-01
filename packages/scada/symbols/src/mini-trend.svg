@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 80" role="img" aria-labelledby="mini-trend-title mini-trend-desc">
+  <title id="mini-trend-title">SCADA mini trend symbol</title>
+  <desc id="mini-trend-desc">Small trend panel with bindable trace, high limit, present value, status text, and alarm marker.</desc>
+  <g id="mini-trend" fill="none" stroke="var(--hmi-line-normal)" stroke-width="2" stroke-linejoin="round">
+    <rect id="mini-trend-frame" x="6" y="8" width="138" height="58" fill="var(--hmi-stopped)"/>
+    <path id="mini-trend-grid" d="M6 27h138M6 46h138M40 8v58M74 8v58M108 8v58" stroke="var(--hmi-bg-group)" stroke-width="1"/>
+    <path id="mini-trend-trace" d="M10 54L30 45L50 49L70 30L90 34L110 20L140 25" stroke="var(--hmi-running)" stroke-width="4" stroke-linecap="round"/>
+    <path id="mini-trend-high-limit" d="M6 18h138" stroke="var(--hmi-alarm-high)" stroke-width="3"/>
+    <path id="mini-trend-alarm-shape" d="M124 12h16l-8 14z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)"/>
+    <text stroke="none" id="mini-trend-alarm-text" x="132" y="24" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="mini-trend-value-text" x="10" y="77" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="var(--hmi-text-value)">0.0</text>
+    <text stroke="none" id="mini-trend-status-text" x="74" y="77" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

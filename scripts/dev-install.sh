@@ -1,7 +1,6 @@
 #!/bin/bash
-# Install a package into the running Docker Node-RED container for local testing.
-# Usage: ./scripts/dev-install.sh <package-dir>
-# Example: ./scripts/dev-install.sh ui-mimic
+# Install the package into the running Docker Node-RED container for local testing.
+# Usage: ./scripts/dev-install.sh [package-dir]   (defaults to "scada")
 #
 # Prerequisites:
 #   - Docker container named "node-red" running on port 1880
@@ -9,7 +8,7 @@
 
 set -e
 
-PKG=${1:?Usage: $0 <package-dir>  e.g. ui-mimic}
+PKG=${1:-scada}
 CONTAINER="node-red"
 PKG_DIR="packages/$PKG"
 

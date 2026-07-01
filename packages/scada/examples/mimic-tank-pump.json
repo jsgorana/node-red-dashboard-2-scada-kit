@@ -1,0 +1,143 @@
+[
+    {
+        "id": "b6b4838a289be1c0",
+        "type": "tab",
+        "label": "SCADA Mimic — Tank & Pump",
+        "disabled": false,
+        "info": "## Tank & Pump Mimic Example\n\nDemonstrates the `ui-scada-mimic` node with declarative tag bindings.\n\n### What it shows\n- **Tank TK-01**: level fill animation (bottom-up), numeric level display\n- **Pump P-101**: run-state color change (gray → blue), status text (STOPPED/RUNNING), live amps\n- **Click interaction**: clicking the pump circle emits a control intent (topic: `open-faceplate`) — wire this to a `ui-scada-faceplate` node to open the motor faceplate\n\n### How the data flows\n```\nInject (2 s) → Tag simulator → ui-scada-mimic → Debug (control intents)\n```\nThe `inject` + `function` (Tag simulator) nodes produce a normalized tag map with quality metadata every 2 seconds. In production, replace them with your OPC UA / Modbus / MQTT / Sparkplug source node.\n\n### Tag map format\n```json\n{\n  \"TK01.level\": { \"value\": 67.2, \"quality\": \"good\", \"units\": \"%\" },\n  \"P101.run\":   { \"value\": true,  \"quality\": \"good\" },\n  \"P101.amps\":  { \"value\": 11.4,  \"quality\": \"good\", \"units\": \"A\" }\n}\n```\n\n### Binding DSL highlights\n- `level` target: animates a `<rect>` height from the bottom up (tank fill)\n- `style` target + `valueMap`: switches fill color between running/stopped states\n- `text` target + `format`: displays numeric value with unit suffix\n- `events[]`: wires element click to an output message"
+    },
+    {
+        "id": "scada-ui-base",
+        "type": "ui-base",
+        "z": "b6b4838a289be1c0",
+        "name": "SCADA Demo UI",
+        "path": "/scada",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "navigationStyle": "default",
+        "titleBarStyle": "default"
+    },
+    {
+        "id": "scada-ui-theme",
+        "type": "ui-theme",
+        "z": "b6b4838a289be1c0",
+        "name": "HP-HMI Theme",
+        "colors": {
+            "surface": "#f5f5f5",
+            "primary": "#546e7a",
+            "bgPage": "#eeeeee",
+            "groupBg": "#e0e0e0",
+            "groupOutline": "#bdbdbd"
+        },
+        "sizes": {
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "6px"
+        }
+    },
+    {
+        "id": "scada-ui-page",
+        "type": "ui-page",
+        "z": "b6b4838a289be1c0",
+        "name": "Tank & Pump Demo",
+        "ui": "scada-ui-base",
+        "path": "/demo",
+        "icon": "mdi-pipe",
+        "layout": "grid",
+        "theme": "scada-ui-theme",
+        "breakpoints": [
+            { "name": "Default", "px": "0", "cols": "3" }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "scada-ui-group",
+        "type": "ui-group",
+        "z": "b6b4838a289be1c0",
+        "name": "Mimic",
+        "page": "scada-ui-page",
+        "width": "3",
+        "height": "3",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "scada-mimic-node",
+        "type": "ui-scada-mimic",
+        "z": "b6b4838a289be1c0",
+        "name": "Tank + Pump",
+        "group": "scada-ui-group",
+        "width": "3",
+        "height": "6",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 300\">\n  <rect width=\"400\" height=\"300\" fill=\"var(--hmi-bg-display,#f5f5f5)\"/>\n\n  <!-- Tank shell -->\n  <rect id=\"TK01_body\" x=\"40\" y=\"44\" width=\"100\" height=\"152\" rx=\"4\" fill=\"none\" stroke=\"#616161\" stroke-width=\"2\"/>\n  <!-- Tank fill — level binding grows this rect from bottom up -->\n  <rect id=\"TK01_fill\" x=\"44\" y=\"44\" width=\"92\" height=\"152\" fill=\"#5c85d6\" opacity=\"0.6\"/>\n  <!-- Tank label (stroke=none prevents glyph bleed from parent g stroke) -->\n  <text x=\"90\" y=\"218\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"11\" font-weight=\"bold\" fill=\"#424242\" stroke=\"none\">TK-01</text>\n  <!-- Numeric level display -->\n  <text id=\"TK01_level_text\" x=\"90\" y=\"232\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"10\" fill=\"#212121\" stroke=\"none\">-- %</text>\n\n  <!-- Process pipe from tank to pump -->\n  <line x1=\"140\" y1=\"170\" x2=\"210\" y2=\"155\" stroke=\"#757575\" stroke-width=\"5\"/>\n\n  <!-- Pump body — fill changes with run state -->\n  <circle id=\"P101_body\" cx=\"240\" cy=\"140\" r=\"32\" fill=\"#9e9e9e\" stroke=\"#616161\" stroke-width=\"2\"/>\n  <!-- Pump impeller symbol -->\n  <polygon id=\"P101_arrow\" points=\"240,120 260,152 220,152\" fill=\"#616161\"/>\n  <!-- Equipment tag label -->\n  <text x=\"240\" y=\"188\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"11\" font-weight=\"bold\" fill=\"#424242\" stroke=\"none\">P-101</text>\n  <!-- Run-state status text -->\n  <text id=\"P101_status\" x=\"240\" y=\"201\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"9\" fill=\"#616161\" stroke=\"none\">STOPPED</text>\n  <!-- Live amps display -->\n  <text id=\"P101_amps\" x=\"240\" y=\"213\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"9\" fill=\"#424242\" stroke=\"none\">-- A</text>\n\n  <!-- Transparent click target over pump — wired in events[] to emit open-faceplate -->\n  <circle id=\"P101_click\" cx=\"240\" cy=\"140\" r=\"34\" fill=\"transparent\" style=\"cursor:pointer\"/>\n</svg>",
+        "bindings": "{\n  \"bindings\": [\n    {\n      \"id\": \"tank-level-fill\",\n      \"selector\": \"#TK01_fill\",\n      \"source\": \"TK01.level\",\n      \"target\": { \"type\": \"level\", \"axis\": \"y\", \"max\": 152 },\n      \"transform\": { \"default\": \"0\", \"quality\": { \"onBad\": \"0\" } }\n    },\n    {\n      \"id\": \"tank-level-text\",\n      \"selector\": \"#TK01_level_text\",\n      \"source\": \"TK01.level\",\n      \"target\": { \"type\": \"text\" },\n      \"transform\": { \"format\": { \"decimals\": 1, \"suffix\": \" %\" }, \"default\": \"-- %\", \"quality\": { \"onBad\": \"-- %\" } }\n    },\n    {\n      \"id\": \"pump-fill\",\n      \"selector\": \"#P101_body\",\n      \"source\": \"P101.run\",\n      \"target\": { \"type\": \"style\", \"name\": \"fill\" },\n      \"transform\": { \"valueMap\": { \"true\": \"#5c85d6\", \"false\": \"#9e9e9e\" }, \"default\": \"#bdbdbd\", \"quality\": { \"onBad\": \"#bdbdbd\" } }\n    },\n    {\n      \"id\": \"pump-status\",\n      \"selector\": \"#P101_status\",\n      \"source\": \"P101.run\",\n      \"target\": { \"type\": \"text\" },\n      \"transform\": { \"valueMap\": { \"true\": \"RUNNING\", \"false\": \"STOPPED\" }, \"default\": \"NO DATA\" }\n    },\n    {\n      \"id\": \"pump-amps\",\n      \"selector\": \"#P101_amps\",\n      \"source\": \"P101.amps\",\n      \"target\": { \"type\": \"text\" },\n      \"transform\": { \"format\": { \"decimals\": 1, \"suffix\": \" A\" }, \"default\": \"-- A\" }\n    }\n  ],\n  \"events\": [\n    {\n      \"selector\": \"#P101_click\",\n      \"action\": \"click\",\n      \"emit\": { \"topic\": \"open-faceplate\", \"payload\": { \"equip\": \"P101\", \"type\": \"motor\" } }\n    }\n  ]\n}",
+        "commLossTimeout": 10000,
+        "x": 180,
+        "y": 80,
+        "wires": [["scada-debug-out"]]
+    },
+    {
+        "id": "scada-inject-sim",
+        "type": "inject",
+        "z": "b6b4838a289be1c0",
+        "name": "Simulate tags (every 2 s)",
+        "props": [{ "p": "payload" }],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.5,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 180,
+        "wires": [["scada-func-sim"]]
+    },
+    {
+        "id": "scada-func-sim",
+        "type": "function",
+        "z": "b6b4838a289be1c0",
+        "name": "Tag simulator",
+        "info": "Produces a normalized tag map with quality metadata.\n\nIn production, replace this node with your protocol source (OPC UA, Modbus, MQTT, Sparkplug, etc.) and ensure its output follows the same tag map format:\n```json\n{\n  \"<tag.name>\": { \"value\": <value>, \"quality\": \"good\", \"units\": \"<unit>\" }\n}\n```\nQuality values: `good`, `bad`, `uncertain`, `stale`.\nBad or stale quality triggers the binding's `onBad` fallback and eventually the comm-loss banner.",
+        "func": "// Simulate oscillating tank level and pump run state\nvar t = Date.now() / 8000;\nvar level = 50 + 30 * Math.sin(t);\nvar running = level > 40;\n\nmsg.payload = {\n    // Tank level — structured form with quality and units\n    'TK01.level': { value: Math.round(level * 10) / 10, quality: 'good', units: '%' },\n    // Pump run state — boolean tag\n    'P101.run':   { value: running, quality: 'good' },\n    // Pump amps — zero when stopped, random 8-12 A when running\n    'P101.amps':  { value: running ? Math.round((8 + 4 * Math.random()) * 10) / 10 : 0, quality: 'good', units: 'A' }\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 180,
+        "wires": [["scada-mimic-node"]]
+    },
+    {
+        "id": "scada-debug-out",
+        "type": "debug",
+        "z": "b6b4838a289be1c0",
+        "name": "Control intents",
+        "info": "Shows messages emitted when an operator clicks an interactive SVG element.\nClick the pump circle on the dashboard to see a message here:\n{ topic: 'open-faceplate', payload: { equip: 'P101', type: 'motor' } }\n\nIn production, wire this to a ui-scada-faceplate node or to your protocol write node.",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 80,
+        "wires": []
+    }
+]

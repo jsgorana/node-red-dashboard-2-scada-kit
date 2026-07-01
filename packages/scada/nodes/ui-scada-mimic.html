@@ -1,0 +1,271 @@
+<script type="text/javascript">
+    (function () {
+        RED.nodes.registerType('ui-scada-mimic', {
+            // Match FlowFuse Dashboard 2.0's own palette category so this node
+            // groups with the stock widgets (resolves to "dashboard 2").
+            category: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.label.category'),
+            color: '#5DADE2',
+            icon: 'font-awesome/fa-object-group',
+            paletteLabel: 'SCADA Mimic',
+            defaults: {
+                name:            { value: '' },
+                group:           { value: '', type: 'ui-group', required: true },
+                width:           { value: 6 },
+                height:          { value: 4 },
+                svg:             { value: '' },
+                bindings:        { value: '{"bindings":[],"events":[]}' },
+                commLossTimeout: { value: 10000 },
+            },
+            inputs: 1,
+            outputs: 1,
+            label: function () { return this.name || 'SCADA Mimic'; },
+
+            oneditprepare: function () {
+                if (RED.nodes.subflow(this.z)) {
+                    $('#node-input-width').attr('type', 'text')
+                    $('#node-input-height').attr('type', 'text')
+                    $('div.form-row.nrdb-scada-hide-in-subflow').hide()
+                    $('div.form-row.nrdb-scada-show-in-subflow').show()
+                } else {
+                    $('div.form-row.nrdb-scada-hide-in-subflow').show()
+                    $('div.form-row.nrdb-scada-show-in-subflow').hide()
+                    $('#node-input-size').elementSizer({
+                        width:  '#node-input-width',
+                        height: '#node-input-height',
+                        group:  '#node-input-group'
+                    })
+                }
+
+                // Validate and pretty-print JSON on focus-out
+                const bindingsField = $('#node-input-bindings');
+                const hint = $('#nrdb-scada-bindings-hint');
+                bindingsField.on('blur', function () {
+                    try {
+                        const pretty = JSON.stringify(JSON.parse(this.value), null, 2);
+                        bindingsField.val(pretty);
+                        hint.text('').removeClass('nrdb-scada-error');
+                    } catch (e) {
+                        hint.text('⚠ Invalid JSON: ' + e.message).addClass('nrdb-scada-error');
+                    }
+                });
+            },
+        });
+    })();
+</script>
+
+<style>
+.nrdb-scada-error { color: #c62828; font-size: 0.82em; }
+</style>
+
+<script type="text/html" data-template-name="ui-scada-mimic">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="SCADA Mimic">
+    </div>
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> Group</label>
+        <input type="text" id="node-input-group">
+    </div>
+    <div class="form-row nrdb-scada-hide-in-subflow">
+        <label><i class="fa fa-object-group"></i> Size</label>
+        <input type="hidden" id="node-input-width">
+        <input type="hidden" id="node-input-height">
+        <button id="node-input-size" class="editor-button">Set widget size</button>
+    </div>
+    <div class="form-row nrdb-scada-show-in-subflow" style="display:none">
+        <label><i class="fa fa-arrows-h"></i> Width</label>
+        <input type="text" id="node-input-width" style="width:60px">
+        &nbsp;<label style="width:auto"><i class="fa fa-arrows-v"></i> Height</label>
+        <input type="text" id="node-input-height" style="width:60px">
+    </div>
+    <div class="form-row">
+        <label for="node-input-commLossTimeout"><i class="fa fa-clock-o"></i> Comm-loss</label>
+        <input type="number" id="node-input-commLossTimeout" min="1000" step="1000" style="width:100px">
+        <span style="margin-left:6px;color:#666;font-size:0.85em">ms without data → comm-loss state</span>
+    </div>
+    <div class="form-row" style="margin-bottom:4px">
+        <label for="node-input-svg"><i class="fa fa-code"></i> SVG</label>
+        <span style="color:#888;font-size:0.82em">Paste your process diagram markup. Give every animated element a unique <code>id</code>.</span>
+    </div>
+    <div class="form-row">
+        <textarea id="node-input-svg" rows="8" style="width:100%;font-family:monospace;font-size:12px"
+            placeholder='&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"&gt;&#10;  &lt;!-- Your process diagram --&gt;&#10;&lt;/svg&gt;'></textarea>
+    </div>
+    <div class="form-row" style="margin-bottom:2px">
+        <label for="node-input-bindings"><i class="fa fa-link"></i> Bindings</label>
+        <span style="color:#888;font-size:0.82em">JSON — see the <b>Info</b> tab for the full DSL reference</span>
+    </div>
+    <div class="form-row">
+        <textarea id="node-input-bindings" rows="10" style="width:100%;font-family:monospace;font-size:12px"
+            placeholder='{"bindings":[{"selector":"#elem","source":"tag.name","target":{"type":"style","name":"fill"},"transform":{"valueMap":{"true":"var(--hmi-running)","false":"var(--hmi-stopped)"},"default":"var(--hmi-nofeedback)"}}],"events":[]}'></textarea>
+    </div>
+    <div class="form-row">
+        <span id="nrdb-scada-bindings-hint" style="font-size:0.82em"></span>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ui-scada-mimic">
+    <p>Renders a process SVG mimic (synoptic display) inside Node-RED Dashboard 2.0.
+    Tag values from any protocol source are mapped to SVG element properties using a
+    declarative JSON binding DSL — no per-screen JavaScript required.
+    Protocol-agnostic: replace the example inject/function simulator with
+    your OPC UA, Modbus, MQTT, or Sparkplug source node.</p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>
+            Tag map. Two accepted forms:
+            <ul>
+                <li><b>Flat:</b> <code>{ "TK01.level": 67.2, "P101.run": true }</code></li>
+                <li><b>Structured:</b> <code>{ "TK01.level": { "value": 67.2, "quality": "good", "units": "%" } }</code></li>
+            </ul>
+            Quality values: <code>good</code>, <code>bad</code>, <code>uncertain</code>, <code>stale</code>.
+            Bad or stale quality triggers the binding's <code>quality.onBad</code> value and eventually
+            the comm-loss banner if no good data arrives within the timeout.
+        </dd>
+        <dt>topic <span class="property-type">string</span></dt>
+        <dd>
+            Optional. Single-tag update: <code>topic</code> is the tag name, <code>payload</code> is the value.<br>
+            <code>{ topic: "P101.run", payload: true }</code> is equivalent to
+            <code>{ payload: { "P101.run": true } }</code>.
+        </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>Control intent emitted when an operator clicks an SVG element listed in <code>events[]</code>.
+            Contains the <code>topic</code> and <code>payload</code> configured in the event binding.
+            Wire to a <b>ui-scada-faceplate</b> or directly to your protocol write node.</dd>
+        <dt>topic <span class="property-type">string</span></dt>
+        <dd>The event topic from <code>events[].emit.topic</code>.</dd>
+    </dl>
+
+    <h3>Configuration</h3>
+    <dl>
+        <dt>Group</dt><dd>Dashboard 2.0 group this widget renders inside.</dd>
+        <dt>Size</dt><dd>Width/height in grid units. One row = 48 px. Use <b>Set widget size</b>.</dd>
+        <dt>Comm-loss (ms)</dt>
+        <dd>Milliseconds without a data update before the widget enters comm-loss state:
+            a gray banner appears and bound elements fall back to their <code>default</code>/<code>quality.onBad</code>
+            values, indicating "no feedback" per HP-HMI guidelines.</dd>
+        <dt>SVG</dt>
+        <dd>The process diagram markup. Must include a <code>viewBox</code>.
+            Give every animated element a stable, unique <code>id</code> — these are what bindings target.<br>
+            <b>Gotcha:</b> if a <code>&lt;text&gt;</code> is inside a <code>&lt;g stroke="..."&gt;</code>,
+            the stroke is inherited and glyphs render as a bold smear. Add <code>stroke="none"</code>
+            to the <code>&lt;text&gt;</code> element to fix this.</dd>
+        <dt>Bindings (JSON)</dt>
+        <dd>The binding DSL configuration. See the <b>Binding DSL</b> section below.</dd>
+    </dl>
+
+    <h3>Binding DSL</h3>
+    <p>A JSON object with two top-level arrays: <code>bindings[]</code> maps tag values to SVG element
+    properties; <code>events[]</code> wires SVG element interactions to output messages.</p>
+    <pre>{
+  "bindings": [
+    {
+      "selector": "#TK01_fill",
+      "source":   "TK01.level",
+      "target":   { "type": "level", "axis": "y", "max": 152 },
+      "transform": { "default": "0", "quality": { "onBad": "0" } }
+    },
+    {
+      "selector": "#TK01_level_text",
+      "source":   "TK01.level",
+      "target":   { "type": "text" },
+      "transform": { "format": { "decimals": 1, "suffix": " %" }, "default": "-- %" }
+    },
+    {
+      "selector": "#P101_body",
+      "source":   "P101.run",
+      "target":   { "type": "style", "name": "fill" },
+      "transform": {
+        "valueMap": { "true": "var(--hmi-running)", "false": "var(--hmi-stopped)" },
+        "default":  "var(--hmi-nofeedback)"
+      }
+    },
+    {
+      "selector": "#P101_amps",
+      "source":   "P101.amps",
+      "target":   { "type": "text" },
+      "transform": {
+        "format":     { "decimals": 1, "suffix": " A" },
+        "thresholds": [{ "op": ">", "value": 18, "result": "HIGH" }],
+        "default":    "-- A"
+      }
+    }
+  ],
+  "events": [
+    {
+      "selector": "#P101_click",
+      "action":   "click",
+      "emit": { "topic": "open-faceplate", "payload": { "equip": "P101", "type": "motor" } }
+    }
+  ]
+}</pre>
+
+    <h4>Target types</h4>
+    <table>
+        <thead><tr><th>Type</th><th>Description</th><th>Extra fields</th></tr></thead>
+        <tbody>
+            <tr><td><code>text</code></td><td>Sets element text content</td><td>—</td></tr>
+            <tr><td><code>style</code></td><td>Sets a CSS style property</td><td><code>name</code>: property (e.g. <code>fill</code>, <code>stroke</code>)</td></tr>
+            <tr><td><code>attribute</code></td><td>Sets an SVG/HTML attribute</td><td><code>name</code>: attribute name</td></tr>
+            <tr><td><code>visibility</code></td><td>Shows or hides the element</td><td>Value <code>true</code> = visible, <code>false</code> = hidden</td></tr>
+            <tr><td><code>level</code></td><td>Animates a <code>&lt;rect&gt;</code> height from bottom up (tank fill). Value is 0–100 %.</td><td><code>axis: "y"</code>, <code>max</code>: pixel height at 100 %</td></tr>
+            <tr><td><code>transform</code></td><td>Applies a CSS transform</td><td><code>name</code>: <code>rotate</code>, <code>translate</code>, or <code>scale</code></td></tr>
+        </tbody>
+    </table>
+
+    <h4>Transform pipeline (applied in order)</h4>
+    <ol>
+        <li><b>scale</b> — linear interpolation: <code>{ "in": [0,100], "out": [0,1] }</code></li>
+        <li><b>valueMap</b> — discrete lookup: <code>{ "true": "RUNNING", "false": "STOPPED" }</code></li>
+        <li><b>thresholds</b> — ordered comparisons: <code>[{ "op": "&gt;", "value": 18, "result": "HIGH" }]</code><br>
+            Operators: <code>&gt;</code> <code>&gt;=</code> <code>&lt;</code> <code>&lt;=</code> <code>==</code> <code>!=</code></li>
+        <li><b>format</b> — numeric display: <code>{ "decimals": 1, "prefix": "", "suffix": " %" }</code></li>
+        <li><b>default</b> — fallback when value is null/undefined: <code>"-- %"</code></li>
+        <li><b>quality</b> — overrides on bad data: <code>{ "onBad": "var(--hmi-nofeedback)", "onUncertain": "?", "onStale": "STALE" }</code></li>
+    </ol>
+
+    <h3>HP-HMI Theme Tokens</h3>
+    <p>Use these CSS variables in bindings to tie colors to the HP-HMI theme.
+    Define them in an SVG <code>&lt;style&gt;</code> block or rely on the dashboard's CSS variables:</p>
+    <table>
+        <thead><tr><th>Variable</th><th>Meaning</th></tr></thead>
+        <tbody>
+            <tr><td><code>--hmi-running</code></td><td>Equipment running / active (blue)</td></tr>
+            <tr><td><code>--hmi-stopped</code></td><td>Equipment stopped / inactive (gray)</td></tr>
+            <tr><td><code>--hmi-nofeedback</code></td><td>No data / comm loss (medium gray)</td></tr>
+            <tr><td><code>--hmi-alarm-high</code></td><td>High-priority alarm (red)</td></tr>
+            <tr><td><code>--hmi-alarm-med</code></td><td>Medium-priority alarm (amber)</td></tr>
+            <tr><td><code>--hmi-bg-display</code></td><td>Display background (light gray)</td></tr>
+            <tr><td><code>--hmi-line-normal</code></td><td>Process lines / borders (mid gray)</td></tr>
+        </tbody>
+    </table>
+    <p><b>Important:</b> these CSS variables are not defined by Dashboard 2.0 itself.
+    Inline them in your SVG <code>&lt;style&gt;</code> block with fallback values:<br>
+    <code>&lt;style&gt;#pump { fill: var(--hmi-running, #1565c0); }&lt;/style&gt;</code></p>
+
+    <h3>Security</h3>
+    <ul>
+        <li>SVG is sanitized <b>server-side</b> (DOMPurify + jsdom) when the flow is deployed,
+            and again <b>client-side</b> before DOM insertion — never trust one layer alone.</li>
+        <li><code>&lt;script&gt;</code>, <code>&lt;foreignObject&gt;</code>, all <code>on*</code> event-handler
+            attributes, and <code>javascript:</code>/<code>data:</code> URIs are stripped at both layers.</li>
+        <li>A MutationObserver re-sanitizes the SVG container if any post-load mutation is detected.</li>
+        <li>Interactivity is wired only via the <code>events[]</code> declarative config — no inline handlers.</li>
+        <li>Compatible with a strict Content Security Policy (<code>script-src 'nonce-{random}' 'strict-dynamic'</code>):
+            no <code>eval</code>, no inline script.</li>
+    </ul>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://github.com/jsgorana/node-red-dashboard-2-scada-kit">GitHub — binding DSL reference &amp; symbol catalog</a></li>
+        <li><a href="https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/getting-started.md">Getting Started tutorial</a></li>
+        <li><a href="https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/binding-dsl.md">Full Binding DSL reference</a></li>
+        <li><a href="https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/symbol-catalog.md">HP-HMI symbol catalog</a></li>
+    </ul>
+</script>

@@ -6,25 +6,28 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "test":  "npm run test  --workspaces --if-present",
-    "lint":  "eslint 'packages/*/src/**/*.{js,vue}' 'packages/*/nodes/**/*.js'",
-    "clean": "rimraf packages/*/dist packages/*/resources"
+    "test": "npm run test  --workspaces --if-present",
+    "lint": "eslint 'packages/*/lib/**/*.{js,vue}' 'packages/*/ui/**/*.{js,vue}' 'packages/*/nodes/**/*.js' 'packages/*/symbols/*.js' 'scripts/**/*.mjs'",
+    "clean": "rimraf packages/*/dist packages/*/resources",
+    "phase3:deploy": "node scripts/deploy-phase3-symbol-tests.mjs",
+    "phase3:verify": "node scripts/verify-phase3-symbol-tests.mjs",
+    "phase4:deploy": "node scripts/deploy-phase4-faceplate-tests.mjs",
+    "phase4:verify": "node scripts/verify-phase4-faceplate-tests.mjs"
   },
   "devDependencies": {
+    "@cyclonedx/cyclonedx-npm": "^5.0.0",
     "@eslint/js": "^9.0.0",
     "@playwright/test": "^1.44.0",
+    "@vitejs/plugin-vue": "^6.0.7",
     "@vue/test-utils": "^2.4.0",
     "eslint": "^9.0.0",
     "eslint-plugin-vue": "^9.0.0",
-    "mocha": "^10.4.0",
-    "node-red": "^5.0.0",
     "node-red-node-test-helper": "^0.3.4",
     "prettier": "^3.2.0",
     "rimraf": "^5.0.0",
     "should": "^13.2.3",
-    "vite": "^5.2.0",
-    "vitest": "^1.6.0",
-    "@cyclonedx/cyclonedx-npm": "^1.19.0"
+    "vite": "^8.1.1",
+    "vitest": "^4.1.9"
   },
   "engines": {
     "node": ">=20.0.0"

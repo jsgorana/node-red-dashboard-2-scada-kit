@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40" role="img" aria-labelledby="pipe-title pipe-desc">
+  <title id="pipe-title">SCADA pipe symbol</title>
+  <desc id="pipe-desc">Pipe segment with bindable line, flow arrows, status text, and leak alarm marker.</desc>
+  <g id="pipe" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <path id="pipe-line" d="M4 20h132" stroke="var(--hmi-stopped)" stroke-width="12" stroke-linecap="round"/>
+    <path id="pipe-flow-arrow-1" d="M38 12l16 8-16 8z" fill="var(--hmi-running)" stroke="none"/>
+    <path id="pipe-flow-arrow-2" d="M78 12l16 8-16 8z" fill="var(--hmi-running)" stroke="none"/>
+    <path id="pipe-alarm-shape" d="M116 4h18l-9 16z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)" stroke-width="2"/>
+    <text stroke="none" id="pipe-alarm-text" x="125" y="18" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="pipe-status-text" x="70" y="37" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

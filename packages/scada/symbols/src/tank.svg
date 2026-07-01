@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-labelledby="tank-title tank-desc">
+  <title id="tank-title">SCADA tank symbol</title>
+  <desc id="tank-desc">Tank with bindable level fill, shell, numeric value, status label, and high-level alarm marker.</desc>
+  <g id="tank" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <path id="tank-shell" d="M20 18h60v76c0 10-60 10-60 0z" fill="var(--hmi-stopped)"/>
+    <rect id="tank-level" x="23" y="58" width="54" height="38" fill="var(--hmi-running)" stroke="none"/>
+    <path id="tank-top" d="M20 18c0 10 60 10 60 0s-60-10-60 0z" fill="var(--hmi-bg-group)"/>
+    <path id="tank-high-mark" d="M80 33h12" stroke="var(--hmi-alarm-high)" stroke-width="4" stroke-linecap="round"/>
+    <path id="tank-alarm-shape" d="M70 5h22l-11 19z" fill="var(--hmi-alarm-high)"/>
+    <text stroke="none" id="tank-alarm-text" x="81" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="tank-value-text" x="50" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="var(--hmi-text-value)">0%</text>
+    <text stroke="none" id="tank-status-text" x="50" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

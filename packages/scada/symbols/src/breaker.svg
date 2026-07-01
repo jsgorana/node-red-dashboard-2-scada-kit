@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="breaker-title breaker-desc">
+  <title id="breaker-title">SCADA breaker symbol</title>
+  <desc id="breaker-desc">Electrical breaker with bindable contacts, blade, trip marker, status text, and alarm diamond.</desc>
+  <g id="breaker" fill="none" stroke="var(--hmi-line-normal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path id="breaker-line-in" d="M50 5v20" stroke="var(--hmi-line-active)"/>
+    <path id="breaker-line-out" d="M50 75v20" stroke="var(--hmi-line-active)"/>
+    <circle id="breaker-contact-top" cx="50" cy="32" r="7" fill="var(--hmi-stopped)"/>
+    <circle id="breaker-contact-bottom" cx="50" cy="68" r="7" fill="var(--hmi-stopped)"/>
+    <path id="breaker-blade" d="M50 32l22 29" stroke="var(--hmi-running)" stroke-width="6"/>
+    <path id="breaker-alarm-shape" d="M19 23l18 18-18 18L1 41z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)" stroke-width="2"/>
+    <text stroke="none" id="breaker-alarm-text" x="19" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text id="breaker-status-text" x="50" y="54" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)" stroke="none">RUNNING</text>
+  </g>
+</svg>

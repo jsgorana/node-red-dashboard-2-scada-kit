@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" role="img" aria-labelledby="valve-ball-title valve-ball-desc">
+  <title id="valve-ball-title">SCADA ball valve symbol</title>
+  <desc id="valve-ball-desc">Ball valve with bindable body, port, actuator, status text, and alarm diamond.</desc>
+  <g id="valve-ball" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <path id="valve-ball-pipe" d="M4 40h112" stroke="var(--hmi-line-active)" stroke-width="6" stroke-linecap="round"/>
+    <circle id="valve-ball-body" cx="60" cy="40" r="24" fill="var(--hmi-stopped)"/>
+    <path id="valve-ball-port" d="M44 40h32" stroke="var(--hmi-bg-panel)" stroke-width="11" stroke-linecap="round"/>
+    <rect id="valve-ball-actuator" x="47" y="8" width="26" height="16" rx="3" fill="var(--hmi-running)"/>
+    <path id="valve-ball-stem" d="M60 24v-8" stroke="var(--hmi-line-active)" stroke-width="4" stroke-linecap="round"/>
+    <path id="valve-ball-alarm-shape" d="M98 9l13 13-13 13-13-13z" fill="var(--hmi-alarm-high)"/>
+    <text stroke="none" id="valve-ball-alarm-text" x="98" y="27" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="valve-ball-status-text" x="60" y="76" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

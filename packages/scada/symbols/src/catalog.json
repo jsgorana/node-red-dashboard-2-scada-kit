@@ -1,0 +1,169 @@
+{
+  "version": "0.1.0",
+  "theme": "HP-HMI / ISA-101",
+  "states": {
+    "stopped": "var(--hmi-stopped)",
+    "running": "var(--hmi-running)",
+    "alarm": "var(--hmi-alarm-high)",
+    "lineNormal": "var(--hmi-line-normal)",
+    "lineActive": "var(--hmi-line-active)"
+  },
+  "symbols": [
+    {
+      "id": "pump",
+      "name": "Pump",
+      "file": "pump.svg",
+      "category": "rotating-equipment",
+      "viewBox": "0 0 120 80",
+      "elements": ["pump", "pump-flow", "pump-flow-arrow", "pump-body", "pump-impeller", "pump-discharge", "pump-alarm-shape", "pump-alarm-text", "pump-status-text"],
+      "bindings": [
+        { "target": "pump-body", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "pump-flow-arrow", "type": "visibility", "states": ["running"] },
+        { "target": "pump-status-text", "type": "text" },
+        { "target": "pump-alarm-shape", "type": "visibility", "states": ["alarm"] },
+        { "target": "pump-alarm-text", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "motor",
+      "name": "Motor",
+      "file": "motor.svg",
+      "category": "rotating-equipment",
+      "viewBox": "0 0 120 80",
+      "elements": ["motor", "motor-body", "motor-fins", "motor-shaft", "motor-bearing", "motor-alarm-shape", "motor-alarm-text", "motor-status-text"],
+      "bindings": [
+        { "target": "motor-body", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "motor-shaft", "type": "attr", "attr": "stroke", "states": ["stopped", "running"] },
+        { "target": "motor-status-text", "type": "text" },
+        { "target": "motor-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "valve-gate",
+      "name": "Gate Valve",
+      "file": "valve-gate.svg",
+      "category": "valves",
+      "viewBox": "0 0 120 80",
+      "elements": ["valve-gate", "valve-gate-pipe", "valve-gate-body-left", "valve-gate-body-right", "valve-gate-stem", "valve-gate-handwheel", "valve-gate-alarm-shape", "valve-gate-alarm-text", "valve-gate-status-text"],
+      "bindings": [
+        { "target": "valve-gate-body-left", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "valve-gate-body-right", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "valve-gate-status-text", "type": "text" },
+        { "target": "valve-gate-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "valve-ball",
+      "name": "Ball Valve",
+      "file": "valve-ball.svg",
+      "category": "valves",
+      "viewBox": "0 0 120 80",
+      "elements": ["valve-ball", "valve-ball-pipe", "valve-ball-body", "valve-ball-port", "valve-ball-actuator", "valve-ball-stem", "valve-ball-alarm-shape", "valve-ball-alarm-text", "valve-ball-status-text"],
+      "bindings": [
+        { "target": "valve-ball-body", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "valve-ball-port", "type": "transform", "states": ["open", "closed"] },
+        { "target": "valve-ball-status-text", "type": "text" },
+        { "target": "valve-ball-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "tank",
+      "name": "Tank",
+      "file": "tank.svg",
+      "category": "vessels",
+      "viewBox": "0 0 100 120",
+      "elements": ["tank", "tank-shell", "tank-level", "tank-top", "tank-high-mark", "tank-alarm-shape", "tank-alarm-text", "tank-value-text", "tank-status-text"],
+      "bindings": [
+        { "target": "tank-level", "type": "level", "axis": "y", "states": ["normal", "alarm"] },
+        { "target": "tank-value-text", "type": "text" },
+        { "target": "tank-status-text", "type": "text" },
+        { "target": "tank-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "conveyor",
+      "name": "Conveyor",
+      "file": "conveyor.svg",
+      "category": "material-handling",
+      "viewBox": "0 0 140 80",
+      "elements": ["conveyor", "conveyor-belt", "conveyor-roller-left", "conveyor-roller-right", "conveyor-arrow-1", "conveyor-arrow-2", "conveyor-frame", "conveyor-alarm-shape", "conveyor-alarm-text", "conveyor-status-text"],
+      "bindings": [
+        { "target": "conveyor-belt", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "conveyor-arrow-1", "type": "visibility", "states": ["running"] },
+        { "target": "conveyor-arrow-2", "type": "visibility", "states": ["running"] },
+        { "target": "conveyor-status-text", "type": "text" }
+      ]
+    },
+    {
+      "id": "breaker",
+      "name": "Breaker",
+      "file": "breaker.svg",
+      "category": "electrical",
+      "viewBox": "0 0 100 100",
+      "elements": ["breaker", "breaker-line-in", "breaker-line-out", "breaker-contact-top", "breaker-contact-bottom", "breaker-blade", "breaker-alarm-shape", "breaker-alarm-text", "breaker-status-text"],
+      "bindings": [
+        { "target": "breaker-blade", "type": "transform", "states": ["open", "closed", "tripped"] },
+        { "target": "breaker-contact-top", "type": "attr", "attr": "fill", "states": ["open", "closed", "tripped"] },
+        { "target": "breaker-contact-bottom", "type": "attr", "attr": "fill", "states": ["open", "closed", "tripped"] },
+        { "target": "breaker-status-text", "type": "text" },
+        { "target": "breaker-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "bargraph",
+      "name": "Bargraph",
+      "file": "bargraph.svg",
+      "category": "indicators",
+      "viewBox": "0 0 80 140",
+      "elements": ["bargraph", "bargraph-frame", "bargraph-value", "bargraph-ticks", "bargraph-high-limit", "bargraph-alarm-shape", "bargraph-alarm-text", "bargraph-value-text", "bargraph-status-text"],
+      "bindings": [
+        { "target": "bargraph-value", "type": "level", "axis": "y" },
+        { "target": "bargraph-value-text", "type": "text" },
+        { "target": "bargraph-high-limit", "type": "attr", "attr": "y" },
+        { "target": "bargraph-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "multistate-indicator",
+      "name": "Multistate Indicator",
+      "file": "multistate-indicator.svg",
+      "category": "indicators",
+      "viewBox": "0 0 120 70",
+      "elements": ["multistate-indicator", "multistate-frame", "multistate-state-shape", "multistate-running-shape", "multistate-alarm-shape", "multistate-alarm-text", "multistate-state-text", "multistate-value-text"],
+      "bindings": [
+        { "target": "multistate-state-shape", "type": "attr", "attr": "fill", "states": ["stopped", "running", "alarm"] },
+        { "target": "multistate-state-text", "type": "text" },
+        { "target": "multistate-value-text", "type": "text" },
+        { "target": "multistate-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "mini-trend",
+      "name": "Mini Trend",
+      "file": "mini-trend.svg",
+      "category": "indicators",
+      "viewBox": "0 0 150 80",
+      "elements": ["mini-trend", "mini-trend-frame", "mini-trend-grid", "mini-trend-trace", "mini-trend-high-limit", "mini-trend-alarm-shape", "mini-trend-alarm-text", "mini-trend-value-text", "mini-trend-status-text"],
+      "bindings": [
+        { "target": "mini-trend-trace", "type": "path" },
+        { "target": "mini-trend-high-limit", "type": "attr", "attr": "d" },
+        { "target": "mini-trend-value-text", "type": "text" },
+        { "target": "mini-trend-alarm-shape", "type": "visibility", "states": ["alarm"] }
+      ]
+    },
+    {
+      "id": "pipe",
+      "name": "Pipe",
+      "file": "pipe.svg",
+      "category": "piping",
+      "viewBox": "0 0 140 40",
+      "elements": ["pipe", "pipe-line", "pipe-flow-arrow-1", "pipe-flow-arrow-2", "pipe-alarm-shape", "pipe-alarm-text", "pipe-status-text"],
+      "bindings": [
+        { "target": "pipe-line", "type": "attr", "attr": "stroke", "states": ["stopped", "running", "alarm"] },
+        { "target": "pipe-flow-arrow-1", "type": "visibility", "states": ["running"] },
+        { "target": "pipe-flow-arrow-2", "type": "visibility", "states": ["running"] },
+        { "target": "pipe-status-text", "type": "text" }
+      ]
+    }
+  ]
+}

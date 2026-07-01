@@ -1,0 +1,206 @@
+<script type="text/javascript">
+    (function () {
+        RED.nodes.registerType('ui-scada-faceplate', {
+            // Match FlowFuse Dashboard 2.0's own palette category so this node
+            // groups with the stock widgets (resolves to "dashboard 2").
+            category: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.label.category'),
+            color: '#AED6F1',
+            icon: 'font-awesome/fa-sliders',
+            paletteLabel: 'SCADA Faceplate',
+            defaults: {
+                name:       { value: '' },
+                group:      { value: '', type: 'ui-group', required: true },
+                width:      { value: 4 },
+                height:     { value: 4 },
+                label:      { value: '' },
+                template:   { value: 'motor' },
+                min:        { value: '' },
+                max:        { value: '' },
+                allowRoles: { value: '' },
+            },
+            inputs: 1,
+            outputs: 2,
+            outputLabels: ['allowed write / state', 'audit'],
+            label: function () { return this.name || this.label || 'SCADA Faceplate'; },
+
+            oneditprepare: function () {
+                if (RED.nodes.subflow(this.z)) {
+                    $('#node-input-width').attr('type', 'text')
+                    $('#node-input-height').attr('type', 'text')
+                    $('div.nrdb-scada-faceplate-hide-in-subflow').hide()
+                    $('div.nrdb-scada-faceplate-show-in-subflow').show()
+                } else {
+                    $('div.nrdb-scada-faceplate-hide-in-subflow').show()
+                    $('div.nrdb-scada-faceplate-show-in-subflow').hide()
+                    $('#node-input-size').elementSizer({
+                        width:  '#node-input-width',
+                        height: '#node-input-height',
+                        group:  '#node-input-group'
+                    })
+                }
+            },
+        })
+    })()
+</script>
+
+<script type="text/html" data-template-name="ui-scada-faceplate">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="SCADA Faceplate">
+    </div>
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> Group</label>
+        <input type="text" id="node-input-group">
+    </div>
+    <div class="form-row nrdb-scada-faceplate-hide-in-subflow">
+        <label><i class="fa fa-object-group"></i> Size</label>
+        <input type="hidden" id="node-input-width">
+        <input type="hidden" id="node-input-height">
+        <button id="node-input-size" class="editor-button">Set widget size</button>
+        <span style="margin-left:6px;color:#888;font-size:0.82em">Recommend ≥ 4 × 4</span>
+    </div>
+    <div class="form-row nrdb-scada-faceplate-show-in-subflow" style="display:none">
+        <label><i class="fa fa-arrows-h"></i> Width</label>
+        <input type="text" id="node-input-width" style="width:60px">
+        &nbsp;<label style="width:auto"><i class="fa fa-arrows-v"></i> Height</label>
+        <input type="text" id="node-input-height" style="width:60px">
+    </div>
+    <div class="form-row">
+        <label for="node-input-label"><i class="fa fa-header"></i> Label</label>
+        <input type="text" id="node-input-label" placeholder="e.g. P-101, TIC-301">
+        <span style="margin-left:6px;color:#888;font-size:0.82em">Equipment tag shown in faceplate header</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-template"><i class="fa fa-sliders"></i> Template</label>
+        <select id="node-input-template" style="width:200px">
+            <option value="motor">Motor — Start / Stop / Auto / Manual</option>
+            <option value="valve">Valve — Open / Close / Auto / Manual</option>
+            <option value="pid">PID — Setpoint entry, Auto / Manual</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-sort-amount-asc"></i> SP limits</label>
+        <label for="node-input-min" style="width:auto">Min</label>
+        <input type="number" id="node-input-min" style="width:80px" placeholder="0">
+        &nbsp;
+        <label for="node-input-max" style="width:auto">Max</label>
+        <input type="number" id="node-input-max" style="width:80px" placeholder="100">
+        <span style="margin-left:6px;color:#888;font-size:0.82em">Enforced server-side; out-of-range writes are denied &amp; audited</span>
+    </div>
+    <div class="form-row">
+        <label for="node-input-allowRoles"><i class="fa fa-shield"></i> Allow roles</label>
+        <input type="text" id="node-input-allowRoles" style="width:240px" placeholder="operator, supervisor, engineer">
+        <span style="margin-left:6px;color:#888;font-size:0.82em">Comma-separated. Default: operator, supervisor, engineer</span>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ui-scada-faceplate">
+    <p>Equipment control faceplate for Node-RED Dashboard 2.0. Provides motor, valve, and PID control
+    panels with a client-side write-confirmation dialog and <b>server-side RBAC</b> (deny-by-default).
+    All write attempts — allowed or denied — are emitted as structured audit records on Output 2.
+    Typically launched by wiring the output of a <b>ui-scada-mimic</b> click event into this node.</p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>
+            Live tag/state data displayed on the faceplate. Supported fields:
+            <ul>
+                <li><code>pv</code> — process variable value (e.g. <code>62.4</code>)</li>
+                <li><code>sp</code> — setpoint value (e.g. <code>65.0</code>)</li>
+                <li><code>mode</code> — control mode: <code>"AUTO"</code>, <code>"MAN"</code>, <code>"CAS"</code></li>
+                <li><code>status</code> — equipment status: <code>"RUNNING"</code>, <code>"STOPPED"</code>, <code>"TRIPPED"</code></li>
+                <li><code>interlock</code> — boolean; when <code>true</code>, command buttons are disabled and labeled INTERLOCKED</li>
+            </ul>
+            Example:
+            <pre>{
+  "pv": 62.4,  "sp": 65.0,
+  "mode": "AUTO",  "status": "RUNNING",
+  "interlock": false
+}</pre>
+        </dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li>
+            <b>Allowed write / state</b><br>
+            Passes through incoming state messages (from Input) and emits operator commands
+            that have passed RBAC and been confirmed. Each message carries the user identity
+            in <code>msg._client</code> for downstream audit/historian use.
+        </li>
+        <li>
+            <b>Audit stream</b><br>
+            Emits a structured audit record for <em>every</em> write attempt — whether allowed or denied.
+            Wire this to a file-write, database-insert, or historian node for compliance logging.
+            <pre>{
+  "payload": {
+    "ts":     1730000000000,
+    "user":   "jsmith",
+    "role":   "operator",
+    "action": "faceplate.write.sp",
+    "payload": { "setpoint": 75.0 },
+    "result": "ALLOWED",
+    "reason": "authorized"
+  }
+}</pre>
+            <code>result</code> is <code>"ALLOWED"</code> or <code>"DENIED"</code>.
+            <code>reason</code> is one of: <code>authorized</code>, <code>role-not-authorized</code>,
+            <code>below-minimum</code>, <code>above-maximum</code>.
+        </li>
+    </ol>
+
+    <h3>Configuration</h3>
+    <dl>
+        <dt>Group</dt><dd>Dashboard 2.0 group this widget renders inside. Recommend at least 4 × 4 grid units.</dd>
+        <dt>Label</dt><dd>Equipment tag shown in the faceplate header (e.g. <code>P-101</code>, <code>TIC-301</code>).</dd>
+        <dt>Template</dt>
+        <dd>Control panel layout:
+            <ul>
+                <li><b>Motor</b> — Start, Stop, Auto, Manual buttons</li>
+                <li><b>Valve</b> — Open, Close, Auto, Manual buttons</li>
+                <li><b>PID</b> — Setpoint numeric entry, Auto, Manual buttons</li>
+            </ul>
+        </dd>
+        <dt>SP limits (Min / Max)</dt>
+        <dd>Engineering setpoint limits. Write attempts with a setpoint outside this range are rejected
+            <em>server-side</em> and emitted as <code>DENIED / below-minimum</code> or
+            <code>DENIED / above-maximum</code> on the audit output. Client-side limit display
+            is additional defense-in-depth.</dd>
+        <dt>Allow roles</dt>
+        <dd>Comma-separated list of roles permitted to write.
+            Default: <code>operator, supervisor, engineer</code>.<br>
+            Roles come from <code>msg._client.user.role</code> (FlowFuse authentication or
+            Node-RED <code>adminAuth</code> with role claims). Without authentication, all
+            writes are denied — useful to verify the RBAC gate before adding auth.</dd>
+    </dl>
+
+    <h3>RBAC and Security Model</h3>
+    <ul>
+        <li><b>Deny-by-default:</b> all writes are blocked unless the user has a configured role.</li>
+        <li><b>Server-side enforcement:</b> RBAC runs in the node <code>.js</code> file.
+            An attacker sending a raw <code>widget-action</code> Socket.IO message as an
+            unauthenticated user will be denied and audited — the browser cannot bypass this gate.</li>
+        <li><b>Write confirmation:</b> the client-side dialog shows the topic and value
+            and requires explicit Confirm before emitting to the server — guards against accidental presses.</li>
+        <li><b>No secrets in flow JSON:</b> use Node-RED <code>credentials</code> for any sensitive config.</li>
+        <li>Satisfies IEC 62443-4-2 CR 2.1 (Authorization enforcement), CR 2.8/2.9 (Audit).</li>
+    </ul>
+
+    <h3>Wiring with ui-scada-mimic</h3>
+    <p>In the mimic's <code>events[]</code> binding, configure a click to emit an open-faceplate intent:</p>
+    <pre>{
+  "selector": "#P101_click",
+  "action":   "click",
+  "emit": { "topic": "open-faceplate", "payload": { "equip": "P101", "type": "motor" } }
+}</pre>
+    <p>Wire the mimic output → a function node that sets <code>msg.payload</code>
+    with the live tag values for that equipment → faceplate input.
+    The faceplate updates its display on every incoming message.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://github.com/jsgorana/node-red-dashboard-2-scada-kit">GitHub — source, examples, docs</a></li>
+        <li><a href="https://github.com/jsgorana/node-red-dashboard-2-scada-kit/blob/main/docs/getting-started.md">Getting Started tutorial</a></li>
+    </ul>
+</script>

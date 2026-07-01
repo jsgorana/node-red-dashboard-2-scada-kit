@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" role="img" aria-labelledby="motor-title motor-desc">
+  <title id="motor-title">SCADA motor symbol</title>
+  <desc id="motor-desc">High-performance HMI motor with bindable casing, shaft, status label, and alarm diamond.</desc>
+  <g id="motor" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <rect id="motor-body" x="24" y="20" width="60" height="38" rx="4" fill="var(--hmi-stopped)"/>
+    <path id="motor-fins" d="M34 20v38M45 20v38M56 20v38M67 20v38" stroke="var(--hmi-line-active)" stroke-width="2"/>
+    <path id="motor-shaft" d="M84 39h26" stroke="var(--hmi-running)" stroke-width="7" stroke-linecap="round"/>
+    <circle id="motor-bearing" cx="24" cy="39" r="10" fill="var(--hmi-bg-panel)"/>
+    <path id="motor-alarm-shape" d="M95 8l15 15-15 15-15-15z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)" stroke-width="2"/>
+    <text stroke="none" id="motor-alarm-text" x="95" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="motor-status-text" x="54" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

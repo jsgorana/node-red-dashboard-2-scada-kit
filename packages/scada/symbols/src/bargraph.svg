@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 140" role="img" aria-labelledby="bargraph-title bargraph-desc">
+  <title id="bargraph-title">SCADA bargraph symbol</title>
+  <desc id="bargraph-desc">Vertical bargraph with bindable value bar, scale ticks, alarm limit, and numeric value.</desc>
+  <g id="bargraph" fill="none" stroke="var(--hmi-line-normal)" stroke-width="2" stroke-linejoin="round">
+    <rect id="bargraph-frame" x="25" y="12" width="30" height="100" fill="var(--hmi-stopped)"/>
+    <rect id="bargraph-value" x="29" y="62" width="22" height="46" fill="var(--hmi-running)" stroke="none"/>
+    <path id="bargraph-ticks" d="M58 12h10M58 37h7M58 62h10M58 87h7M58 112h10" stroke="var(--hmi-line-active)"/>
+    <path id="bargraph-high-limit" d="M15 30h50" stroke="var(--hmi-alarm-high)" stroke-width="4"/>
+    <path id="bargraph-alarm-shape" d="M8 18h16L16 32z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)"/>
+    <text stroke="none" id="bargraph-alarm-text" x="16" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="bargraph-value-text" x="40" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="var(--hmi-text-value)">0%</text>
+    <text stroke="none" id="bargraph-status-text" x="40" y="124" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>

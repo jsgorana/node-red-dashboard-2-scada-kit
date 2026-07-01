@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" role="img" aria-labelledby="pump-title pump-desc">
+  <title id="pump-title">SCADA pump symbol</title>
+  <desc id="pump-desc">High-performance HMI pump with bindable body, impeller, status label, alarm badge, and flow arrow.</desc>
+  <g id="pump" fill="none" stroke="var(--hmi-line-normal)" stroke-width="3" stroke-linejoin="round">
+    <path id="pump-flow" d="M8 40h24" stroke="var(--hmi-line-active)" stroke-width="5" stroke-linecap="round"/>
+    <path id="pump-flow-arrow" d="M28 31l15 9-15 9z" fill="var(--hmi-running)" stroke="none"/>
+    <circle id="pump-body" cx="62" cy="40" r="26" fill="var(--hmi-stopped)"/>
+    <path id="pump-impeller" d="M62 22c9 10 10 25 0 36c-9-10-10-25 0-36z" fill="var(--hmi-bg-panel)" stroke="var(--hmi-line-normal)" stroke-width="2"/>
+    <path id="pump-discharge" d="M88 40h24" stroke="var(--hmi-line-active)" stroke-width="5" stroke-linecap="round"/>
+    <path id="pump-alarm-shape" d="M86 8h22l-11 19z" fill="var(--hmi-alarm-high)" stroke="var(--hmi-line-normal)" stroke-width="2"/>
+    <text stroke="none" id="pump-alarm-text" x="97" y="23" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="var(--hmi-text-primary)">!</text>
+    <text stroke="none" id="pump-status-text" x="62" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="var(--hmi-text-label)">RUNNING</text>
+  </g>
+</svg>
