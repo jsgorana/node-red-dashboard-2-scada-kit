@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@cyclonedx/cyclonedx-npm": "^5.0.0",
-    "@eslint/js": "^9.0.0",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.44.0",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vue/test-utils": "^2.4.0",
