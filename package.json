@@ -20,13 +20,13 @@
     "@playwright/test": "^1.44.0",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vue/test-utils": "^2.4.0",
-    "eslint": "^9.0.0",
-    "eslint-plugin-vue": "^9.0.0",
+    "eslint": "^10.6.0",
+    "eslint-plugin-vue": "^10.9.2",
     "node-red-node-test-helper": "^0.3.4",
     "prettier": "^3.2.0",
     "rimraf": "^5.0.0",
     "should": "^13.2.3",
-    "vite": "^8.1.1",
+    "vite": "^8.1.2",
     "vitest": "^4.1.9"
   },
   "engines": {
