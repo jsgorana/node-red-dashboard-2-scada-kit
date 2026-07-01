@@ -65,15 +65,13 @@ Equipment faceplate (PID shown) with setpoint entry, mode buttons, a client-side
 
 ## Installation
 
-> *(Not yet published — install from source during development)*
-
-### Palette Manager *(once published)*
+### Palette Manager
 
 1. Open **Menu → Manage palette → Install**
 2. Search `@jsgorana/node-red-dashboard-2-scada`
 3. Click **Install** — both nodes are added.
 
-### npm *(once published)*
+### npm
 
 ```bash
 npm install @jsgorana/node-red-dashboard-2-scada
