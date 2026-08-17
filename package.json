@@ -15,7 +15,7 @@
     "phase4:verify": "node scripts/verify-phase4-faceplate-tests.mjs"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^5.0.0",
+    "@cyclonedx/cyclonedx-npm": "^6.0.1",
     "@eslint/js": "^9.0.0",
     "@playwright/test": "^1.44.0",
     "@vitejs/plugin-vue": "^6.0.7",
