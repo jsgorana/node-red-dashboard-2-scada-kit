@@ -67,7 +67,7 @@
     "sanitize-html": "^2.13.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.7",
+    "@vitejs/plugin-vue": "^6.0.9",
     "@vue/test-utils": "^2.4.0",
     "rimraf": "^5.0.0",
     "vite": "^8.1.1",
